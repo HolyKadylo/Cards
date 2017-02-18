@@ -34,25 +34,24 @@ public class DataBase{
 	}
 
 	Soldier getSoldier(int id) throws NoSuchElementException{			//TODO
-		Connection connection = null;
-		String sentense = "SELECT firstName, lastName, department, password FROM Employees WHERE id = ?";
-		PreparedStatement statement = connection.prepareStatement(sentense);
-		statement.setInt(1, id);
-		ResultSet rs = statement.executeQuery();
-
-		Soldier sold = new Soldier ();		
-		try { 
-			con = Pool.getConnection();
-			Statement st = con.createStatement();
-			st.execute("CREATE TABLE Superhello (id COUNTER, descr text(400))");
+		Soldier sold = new Soldier ();
+		try (Connection connection = Pool.getConnection())
+		{ 
+			// now this was added to try-with-resources
+			// Connection connection = Pool.getConnection();
+			String sentense = "SELECT firstName, lastName, department, password FROM Employees WHERE id = ?";
+			PreparedStatement statement = connection.prepareStatement(sentense);
+			statement.setInt(1, id);
+			ResultSet rs = statement.executeQuery();
+			if (rs.getFetchSize() != 1)
+				throw new NoSuchElementException("Specified ID was not found or occured more than once");
+			sold.setFirstName(rs.getString("firstName"));
+			sold.setLastName(rs.getString("lastName"));
+			sold.setDepartment(rs.getInt("department"));
 		} catch (SQLException e){
 			System.out.println("DB issue: " + e.toString());	
 			System.exit(0);
-		} finally { 
-			if (connection != null) connection .close(); 
 		}
-
-		sold.setFirstName("Adolph");
 
 		/*throw new NoSuchElementException(
 		"Soldier with id " + id + " doesn't exist"

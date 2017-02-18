@@ -235,6 +235,14 @@ public class Soldier implements Commanders, Soldiers {
 	public void setFirstName(String name){
 		this.firstName = name;
 	};
+	
+	public void setLastName(String name){
+		this.lastName = name;
+	};
+	
+	public void setDepartment(int department){
+		this.department = department;
+	};
 
 	/*Getters*/
 	public String getFirstName(){
