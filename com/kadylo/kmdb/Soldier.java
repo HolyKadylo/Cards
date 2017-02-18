@@ -281,16 +281,15 @@ public class Soldier implements Commanders, Soldiers {
 	public static void main(String[] args){
 		System.out.println("==========Testing Soldier.class=========\n");
 		System.out.println("Creating two different soldiers");
-		DataBase db = new DataBase();
-		Soldier ssmann = new Soldier (1, db);
-		Soldier ssmann2 = new Soldier (2, db);
+		Soldier ssmann = new Soldier (1, DataBase.access());
+		Soldier ssmann2 = new Soldier (2, DataBase.access());
 		System.out.println("One soldier is equal to another: " + ssmann.equals(ssmann2));
 		System.out.println("Soldier\'s 1 hashCode()=" + ssmann.hashCode());
 		System.out.println("Soldier\'s 2 hashCode()=" + ssmann2.hashCode());
 		System.out.println(ssmann.getFirstName());
 		System.out.println(ssmann2.getFirstName());
 		System.out.println(ssmann.equals(ssmann2));
-		Soldier ssmann3 = new Soldier (1, db);
+		Soldier ssmann3 = new Soldier (1, DataBase.access());
 		System.out.println(ssmann.equals(ssmann3));
 		System.out.println(ssmann3.equals(ssmann));
 		System.out.println("=========Soldier.class tested=========\n");

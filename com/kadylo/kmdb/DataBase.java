@@ -17,19 +17,35 @@ import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 public class DataBase{
-	private static final String PATH_TO_DB = "D:/J/jj/resources/KMDB.accdb";
+	
+	// non UTF-8
+	private static final String PATH = DataBase.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+	//private static final String PATH_TO_DB = PATH.substring(0, PATH.indexOf("com/kadylo/kmdb")) + "/resources/KMDB.accdb";
+	private static String PATH_TO_DB = "resources/KMDB.accdb";
 	private static final String PROPFILE = "resources/DBProps.properties";
 	private static final String password = "PsSwRd";
 	private static final String EXPECTED_POOL_SIGNATURE = "tH15_is=15_THthee_eexXxqeCcded==p00L-51gn1tuR";
 
+	// "Thinking in Java" by Bruce Eckel p.160 
+	private static DataBase database = new DataBase();
+	public static DataBase access(){
+		return database;
+	}
+	
 	/*Constructors*/
-	DataBase(){
-		
+	private DataBase(){
+		try{
+			PATH_TO_DB = java.net.URLDecoder.decode(PATH, "UTF-8") + PATH_TO_DB;
+			System.out.println("PDB " + PATH_TO_DB);
+		} catch (UnsupportedEncodingException e){
+			System.out.println("DB issue: " + e.toString());
+		}
 	};
 	
-	DataBase(String user, String password){
+	private DataBase(String user, String password){
 		
 	}
 
@@ -40,11 +56,16 @@ public class DataBase{
 			// now this was added to try-with-resources
 			// Connection connection = Pool.getConnection();
 			String sentense = "SELECT firstName, lastName, department, password FROM Employees WHERE id = ?";
+			//String sentense = "SELECT * FROM Employees";
 			PreparedStatement statement = connection.prepareStatement(sentense);
 			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();
-			if (rs.getFetchSize() != 1)
-				throw new NoSuchElementException("Specified ID was not found or occured more than once");
+			rs.next();
+			//while (rs.next()){
+				System.out.println("NN: " + rs.getInt("department"));
+			//}
+			//if (rs.getFetchSize() != 1)
+				//throw new NoSuchElementException("Specified ID was not found or occured more than once");
 			sold.setFirstName(rs.getString("firstName"));
 			sold.setLastName(rs.getString("lastName"));
 			sold.setDepartment(rs.getInt("department"));
@@ -90,7 +111,11 @@ public class DataBase{
 
 	/*Test*/
 	public static void main (String[] args){
-	
+		System.out.println("p" + PATH);
+		System.out.println("pdb " + PATH_TO_DB);
+		System.out.println("dep: " + DataBase.access().getSoldier(1).getDepartment());
+		System.out.println("fir: " + DataBase.access().getSoldier(1).getFirstName());
+		System.out.println("las: " + DataBase.access().getSoldier(1).getLastName());
 		/*Based on example Withoud JNDI
 		 * commons-dbcp2-2.1.1 apidocs
 		 * Package org.apache.commons.dbcp2.datasources
@@ -138,10 +163,9 @@ class Pool {
 	private static final String classSignature = "tH15_is=15_THthee_eexXxqeCcded==p00L-51gn1tuR";
 	static { 
 
-		DataBase dtbs = new DataBase();
-		String PROPFILE = dtbs.getPropfile();
-		String PASSWORD = dtbs.getPassword(classSignature);
-		String PATH_TO_DB = dtbs.getPathToDB();
+		String PROPFILE = DataBase.access().getPropfile();
+		String PASSWORD = DataBase.access().getPassword(classSignature);
+		String PATH_TO_DB = DataBase.access().getPathToDB();
 		
 		DriverAdapterCPDS cpds = new DriverAdapterCPDS(); 
 		try{

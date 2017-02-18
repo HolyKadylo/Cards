@@ -323,8 +323,7 @@ public class Commander implements Commanders, Soldiers {
 	}
 
 	public Commander getMaster(){
-		DataBase db = new DataBase();
-		Set<Commander> commanders = db.getAllMasters();
+		Set<Commander> commanders = DataBase.access().getAllMasters();
 		for (Commander comm : commanders){
 			if (comm.getDirectSlaves().contains(this.getId())){
 				return comm;

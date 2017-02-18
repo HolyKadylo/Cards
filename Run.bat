@@ -1,3 +1,4 @@
+chcp 1251
 echo off
 cls
 type Start2.txt
