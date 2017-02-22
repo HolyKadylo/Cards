@@ -49,23 +49,17 @@ public class DataBase{
 		
 	}
 
-	Soldier getSoldier(int id) throws NoSuchElementException{			//TODO
+	Soldier getSoldier(int id) }throws NoSuchElementException{			//TODO
 		Soldier sold = new Soldier ();
 		try (Connection connection = Pool.getConnection())
 		{ 
 			// now this was added to try-with-resources
 			// Connection connection = Pool.getConnection();
 			String sentense = "SELECT firstName, lastName, department, password FROM Employees WHERE id = ?";
-			//String sentense = "SELECT * FROM Employees";
 			PreparedStatement statement = connection.prepareStatement(sentense);
 			statement.setInt(1, id);
 			ResultSet rs = statement.executeQuery();
 			rs.next();
-			//while (rs.next()){
-				System.out.println("NN: " + rs.getInt("department"));
-			//}
-			//if (rs.getFetchSize() != 1)
-				//throw new NoSuchElementException("Specified ID was not found or occured more than once");
 			sold.setFirstName(rs.getString("firstName"));
 			sold.setLastName(rs.getString("lastName"));
 			sold.setDepartment(rs.getInt("department"));
@@ -160,6 +154,8 @@ public class DataBase{
 
 class Pool { 
 	private static SharedPoolDataSource ds;
+	
+	// TODO: too weak 
 	private static final String classSignature = "tH15_is=15_THthee_eexXxqeCcded==p00L-51gn1tuR";
 	static { 
 
