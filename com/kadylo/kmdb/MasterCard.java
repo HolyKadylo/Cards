@@ -36,6 +36,7 @@ public abstract class MasterCard{
 							// chiefController + SecControllers
 
 	/* constructors*/
+	MasterCard(){};
 	MasterCard(Commander chief, 
 		Soldier primaryExecutor, 
 		Document document, 

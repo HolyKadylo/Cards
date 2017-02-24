@@ -2,6 +2,7 @@ chcp 1251
 echo off
 cls
 type Start2.txt
+java com.kadylo.kmdb.Application
 java com.kadylo.kmdb.DataBase
 java com.kadylo.kmdb.Card
 java com.kadylo.kmdb.Commander

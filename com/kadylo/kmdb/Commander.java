@@ -23,16 +23,16 @@ public class Commander implements Commanders, Soldiers {
 	private String lastName;				// Iwanchuk
 	private int department;
 	//private Set<Card> cardsToExecute;
-	private Set<Card> cardsToControll;
+	private TreeSet<String> cardsToControll;		// String IDs of cards
 	//private HashMap<Card, Boolean> maySign;		// Maps allowments to close the 
 							// specific card
-	private Set<Integer> directSlaves;			// int IDs of direct slaves
+	private TreeSet<Integer> directSlaves;		// int IDs of direct slaves
 							// no matter they are soldiers
 							// or commanders themselves
-	private Set<String> maySign;			// String IDs of cards that this 
+	private TreeSet<String> maySign;			// String IDs of cards that this 
 							// particular master is allowed to close
-	private Set<Document> producedDocuments;
-	private Set<Document> starredDocuments;		// Documents where this commander
+	private Set<Integer> producedDocuments;
+	private Set<Integer> starredDocuments;		// Documents where this commander
 							// was a star (executor)
 
 	//private ArrayList<String> colorOrder;		// Deprecated since there is no need in password sequence	
@@ -61,15 +61,15 @@ public class Commander implements Commanders, Soldiers {
 		firstName = "Big";
 		lastName = "Chief";
 		department = 100;
-		cardsToControll = new TreeSet<Card>();
+		cardsToControll = new TreeSet<String>();
 		directSlaves = new TreeSet<Integer>();
-		producedDocuments = new TreeSet<Document>();
-		starredDocuments = new TreeSet<Document>();
+		producedDocuments = new TreeSet<Integer>();
+		starredDocuments = new TreeSet<Integer>();
 		maySign = new TreeSet<String>();
 		
 	}
 
-	Commander(int id, String firstName, String lastName, int department, Set<Integer> directSlaves){
+	Commander(int id, String firstName, String lastName, int department, TreeSet<Integer> directSlaves){
 		this(id, firstName, lastName, directSlaves);
 		/*if (department == 0)
 			throw new NullPointerException(
@@ -78,7 +78,7 @@ public class Commander implements Commanders, Soldiers {
 		this.setDepartment(department);
 	}	
 
-	Commander(int id, String firstName, String lastName, Set<Integer> directSlaves){
+	Commander(int id, String firstName, String lastName, TreeSet<Integer> directSlaves){
 		if (firstName == null 
 			|| lastName == null 
 			|| directSlaves == null)
@@ -92,7 +92,7 @@ public class Commander implements Commanders, Soldiers {
 	}	
 
 	/* next two with passwords at once*/
-	Commander(int id, String firstName, String lastName, int department, Set<Integer> directSlaves, String password){
+	Commander(int id, String firstName, String lastName, int department, TreeSet<Integer> directSlaves, String password){
 		this(id, firstName, lastName, department, directSlaves);
 		if (password == null || password.equals(""))
 			throw new NullPointerException(
@@ -101,7 +101,7 @@ public class Commander implements Commanders, Soldiers {
 		this.setPassword(password);
 	}	
 
-	Commander(int id, String firstName, String lastName, Set<Integer> directSlaves, String password){
+	Commander(int id, String firstName, String lastName, TreeSet<Integer> directSlaves, String password){
 		this(id, firstName, lastName, directSlaves);
 		if (password == null || password.equals(""))
 			throw new NullPointerException(
@@ -269,9 +269,13 @@ public class Commander implements Commanders, Soldiers {
 		maySign.add(id);
 	};
 
-	/*Getters & Setters*/
+	/*Setters*/
 	public void setFirstName(String s){
 		this.firstName = s;
+	}
+		
+	public void setLastName(String s){
+		this.lastName = s;
 	}
 
 	public void setDepartment(int dep){
@@ -282,6 +286,23 @@ public class Commander implements Commanders, Soldiers {
 		this.password = password;
 	}
 
+	public void setCardsToControll(TreeSet<String> cards){
+		cardsToControll = cards;
+	}
+
+	public void setDirectSlaves(TreeSet<Integer> slaves){
+		directSlaves = slaves;
+	}
+
+	public void setProducedDocuments(TreeSet<Integer> docs){
+		producedDocuments = docs;
+	}
+
+	public void setStarredDocuments(TreeSet<Integer> docs){
+		starredDocuments = docs;
+	}
+
+	/*Getters*/
 	public String getPassword(){
 		return password;
 	}
@@ -294,19 +315,19 @@ public class Commander implements Commanders, Soldiers {
 		return department;
 	}
 
-	public Set<Card> getCardsToControll(){
+	public TreeSet<String> getCardsToControll(){
 		return cardsToControll;
 	}
 	
-	public Set<String> getMaySign(){
+	public TreeSet<String> getMaySign(){
 		return maySign;
 	}
 
-	public Set<Document> getProducedDocuments(){
+	public Set<Integer> getProducedDocuments(){
 		return producedDocuments;
 	}
 
-	public Set<Document> getStarredDocuments(){
+	public Set<Integer> getStarredDocuments(){
 		return starredDocuments;
 	}
 
@@ -318,7 +339,7 @@ public class Commander implements Commanders, Soldiers {
 		return id;
 	}
 
-	public Set<Integer> getDirectSlaves(){
+	public TreeSet<Integer> getDirectSlaves(){
 		return directSlaves;
 	}
 
@@ -364,33 +385,33 @@ public class Commander implements Commanders, Soldiers {
 		System.out.println("Testing constructors");
 		
 		// First generation slaves
-		Set<Integer> FGslaves = new TreeSet<Integer>();
+		TreeSet<Integer> FGslaves = new TreeSet<Integer>();
 		FGslaves.add(2);
 		FGslaves.add(3);
 		FGslaves.add(4);
 		
 		// second
-		Set<Integer> SGslaves = new TreeSet<Integer>();
+		TreeSet<Integer> SGslaves = new TreeSet<Integer>();
 		SGslaves.add(20);
 		SGslaves.add(30);
 		SGslaves.add(40);	
 
 		// third
-		Set<Integer> TGslaves = new TreeSet<Integer>();
+		TreeSet<Integer> TGslaves = new TreeSet<Integer>();
 		TGslaves.add(200);
 		TGslaves.add(300);
 		TGslaves.add(400);
 	
-		//(int id, String firstName, String lastName, int department, Set<Integer> directSlaves
+		//(int id, String firstName, String lastName, int department, TreeSet<Integer> directSlaves
 		Commander con = new Commander(1, "Bogdan", "Khmelnitsky", 0, FGslaves);
 
-		//(int id, String firstName, String lastName, Set<Integer> directSlaves)
+		//(int id, String firstName, String lastName, TreeSet<Integer> directSlaves)
 		Commander con2 = new Commander(2, "Iwan", "Bogun", SGslaves);
 
-		//(int id, String firstName, String lastName, int department, Set<Integer> directSlaves, String password)
+		//(int id, String firstName, String lastName, int department, TreeSet<Integer> directSlaves, String password)
 		Commander con3 = new Commander(3, "Maksym", "Kryvonis", 0, SGslaves, "HELLO_PASSWORD");
 		
-		//(int id, String firstName, String lastName, Set<Integer> directSlaves, String password)
+		//(int id, String firstName, String lastName, TreeSet<Integer> directSlaves, String password)
 		Commander con4 = new Commander(4, "Taras", "Tryasylo", SGslaves, "ANOTHER_PASS");		
 		System.out.println(" ");
 		System.out.println(con == con2);

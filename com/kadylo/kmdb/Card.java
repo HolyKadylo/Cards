@@ -44,10 +44,48 @@ public class Card extends MasterCard{
 								// chiefController + SecControllers
 
 	/* constructors*/
+	//default
+	Card(){
+
+	}
+
+	// for database where card is created from its id
+	// TODO Merge
+	Card(String id, Commander chief, Date created, Date directive, Date closed, String task, Soldier primaryExecutor, Document document){
+		if (chief == null 
+			|| created == null 
+			|| directive == null 
+			|| task == null 
+			|| primaryExecutor == null 
+			|| document == null) 
+				throw new NullPointerException(
+					"Failed to construct Card without secondary controllers"
+				);
+		this.id = id;
+		chiefController = chief;
+		this.created = created;
+		this.directive = directive;
+		this.closed = closed;
+		this.task = task;
+		this.primaryExecutor = primaryExecutor;
+		this.document = document;
+
+		closedSign = new Signature (chiefController);
+		
+		/*Here they are created void*/
+		secondaryExecutors = new HashMap  <Soldier, String>();
+		secondaryControllers = new HashMap <Commander, HashMap<Signature, String>>();
+		pushed = new HashMap <Commander, Boolean>();
+
+		/*Except for this one, we need it 'cause there is nowhere else to change it*/
+		pushed.put(chiefController, false);
+	}
+
 	Card(Commander chief, 
 		Soldier primaryExecutor, 
 		Document document, 
-		String content, Date directive){
+		String content, 
+		Date directive){
 		
 		super(chief, primaryExecutor, document, content);
 		if (chief == null 
@@ -92,6 +130,7 @@ public class Card extends MasterCard{
 		this.directive = directive;
 	};
 
+	// With secondary controllers
 	Card(Commander chief, 
 		Soldier primaryExecutor, 
 		Document document, 

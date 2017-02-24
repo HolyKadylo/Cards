@@ -19,13 +19,16 @@ public class Soldier implements Commanders, Soldiers {
 	private String firstName;				// Serhiy Petrowitsch
 	private String lastName;				// Swynya
 	private int department;
-	private TreeSet<Card> cardsToExecute;
+	private TreeSet<String> cardsToExecute;		//String IDs of cards
 	//private Set<Card> cardsToControll;
-	private TreeSet<Integer> directSlaves;			// int IDs of direct slaves
+	private TreeSet<Integer> directSlaves;		// int IDs of direct slaves
 							// no matter they are soldiers
 							// or commanders themselves
-	private TreeSet<Document> producedDocuments;
-	private TreeSet<Document> starredDocuments;		// Documents where this commander
+	
+	// Here we are using integers, assuming that only one active document with given chara
+	// cteristics circulies on the firm
+	private TreeSet<Integer> producedDocuments;
+	private TreeSet<Integer> starredDocuments;		// IDs of documents where this solider
 							// was a star (executor)
 
 	/*Constructors*/
@@ -38,10 +41,10 @@ public class Soldier implements Commanders, Soldiers {
 		firstName = "John";
 		lastName = "Doe";
 		department = 10;
-		cardsToExecute = new TreeSet<Card>();
+		cardsToExecute = new TreeSet<String>();
 		directSlaves = new TreeSet<Integer>();
-		producedDocuments = new TreeSet<Document>();
-		starredDocuments = new TreeSet<Document>();
+		producedDocuments = new TreeSet<Integer>();
+		starredDocuments = new TreeSet<Integer>();
 	};
 
 	/* Full */
@@ -49,10 +52,10 @@ public class Soldier implements Commanders, Soldiers {
 		String firstName, 
 		String lastName, 
 		int dept, 
-		TreeSet<Card> cardsToExecute, 
+		TreeSet<String> cardsToExecute, 
 		TreeSet<Integer> directSlaves, 
-		TreeSet<Document> producedDocuments, 
-		TreeSet<Document> starredDocuments){
+		TreeSet<Integer> producedDocuments, 
+		TreeSet<Integer> starredDocuments){
 
 		if(firstName == null 
 			|| lastName == null 
@@ -244,6 +247,22 @@ public class Soldier implements Commanders, Soldiers {
 		this.department = department;
 	};
 
+	public void setCardsToExecute(TreeSet<String> cards){
+		cardsToExecute = cards;
+	}
+
+	public void setDirectSlaves(TreeSet<Integer> slaves){
+		directSlaves = slaves;
+	}
+
+	public void setProducedDocuments(TreeSet<Integer> docs){
+		producedDocuments = docs;
+	}
+
+	public void setStarredDocuments(TreeSet<Integer> docs){
+		starredDocuments = docs;
+	}
+
 	/*Getters*/
 	public String getFirstName(){
 		return firstName;
@@ -257,7 +276,7 @@ public class Soldier implements Commanders, Soldiers {
 		return department;
 	}
 
-	public TreeSet<Card> getCardsToExecute(){
+	public TreeSet<String> getCardsToExecute(){
 		return cardsToExecute;
 	}
 
@@ -265,11 +284,11 @@ public class Soldier implements Commanders, Soldiers {
 		return directSlaves;
 	}
 
-	public TreeSet<Document> getProducedDocuments(){
+	public TreeSet<Integer> getProducedDocuments(){
 		return producedDocuments;
 	}
 
-	public TreeSet<Document> getStarredDocuments(){
+	public TreeSet<Integer> getStarredDocuments(){
 		return starredDocuments;
 	}
 	

@@ -18,18 +18,22 @@ public class Document extends MasterDocument{
 	private File scanned;					// scan of the document created with
 								// File (String) constructor
 	
-	/*constructor*/
-	Document (int dep, int num, Date date, Commander comm, Soldier sol, String title, File scanned){
-		super(dep,num,date,comm,sol,title,scanned);
+	/*constructors*/
+	Document (){
+		super();
+	}
+	
+	//without scanned file
+	Document (int dep, int num, Date date, Commander comm, Soldier sol, String title){
+		super(dep,num,date,comm,sol,title);
 		if (dep == 0 
 			|| num == 0 
 			|| date == null 
-			|| comm == null 
-			|| sol == null 
-			|| title == null 
-			|| scanned == null) 
+			|| comm == null
+			|| sol == null
+			|| title == null ) 
 				throw new NullPointerException(
-					"Failed to construct document"
+					"Failed to construct document due to null args"
 				);
 		department = dep;
 		number = num;
@@ -37,6 +41,14 @@ public class Document extends MasterDocument{
 		producer = comm;
 		star = sol;
 		this.title = title;
+	};
+	
+	Document (int dep, int num, Date date, Commander comm, Soldier sol, String title, File scanned){
+		this(dep,num,date,comm,sol,title);
+		if (scanned == null) 
+			throw new NullPointerException(
+					"Failed to construct document due to null scanned document"
+				);
 		this.scanned = scanned;
 	};
 
@@ -72,6 +84,10 @@ public class Document extends MasterDocument{
 		return number;
 	};
 
+	Date getDate(){
+		return date;
+	}
+
 	String getTitle(){
 		return title;
 	};
@@ -88,11 +104,41 @@ public class Document extends MasterDocument{
 		return scanned;
 	};
 
+	/*setters*/
+	void setDepartment(int dpt){
+		this.department = dpt;
+	};
+
+	void setNumber(int num){
+		this.number = num;
+	};
+
+	void setDate(Date dt){
+		this.date = dt;
+	}
+
+	void setTitle(String ttl){
+		this.title = ttl;
+	};
+
+	void setProducer(Commander prdsr){
+		this.producer = prdsr;
+	};
+
+	void setStar(Soldier sld){
+		this.star = sld;
+	};
+
+	void setScan(File scn){
+		this.scanned = scn;
+	};
+
+	// Test
 	public static void main(String[] args){
 		System.out.println("=========Testing Document.class=========\n");
 		System.out.println("Creating two documents");
-		Document doc1 = new Document (10,4556,new Date(),new Commander(), new Soldier(), "14hh88", new File("Compile.bat"));
-		Document doc2 = new Document (11,4533,new Date(),new Commander(), new Soldier(), "14hh88", new File("Compile.bat"));
+		Document doc1 = new Document (10,4556,new Date(), new Commander(), new Soldier(), "14hh88", new File("Compile.bat"));
+		Document doc2 = new Document (11,4533,new Date(), new Commander(), new Soldier(), "14hh88", new File("Compile.bat"));
 		System.out.println("Different documents are equal(): " + doc1.equals(doc2));
 		Document doc3 = doc1;
 		System.out.println("Same documents are equal(): " + doc1.equals(doc3));

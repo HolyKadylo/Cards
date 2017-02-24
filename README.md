@@ -1,2 +1,2 @@
 # Cards
-Management system on old plants was based on orders that were produced by director and documented commands of his deputies. This documents were mandatory to execute, yet employees often forgot to. Here where cards make step forward. To be short, card is simply the mark that has to be extinguished. Card circulating system was a nervous system of the plant.
+This is the computer representation of ancient cards Control system

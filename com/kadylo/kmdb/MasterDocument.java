@@ -14,10 +14,23 @@ abstract class MasterDocument {
 	Commander producer;				// director of department that 
 							// created the document
 
-	Soldier star;					// executor of IRL document
+	Soldier  star;					// executor of IRL document
 	File scanned;
 	
-	/*constructor*/
+	/*constructors*/
+	MasterDocument(){
+
+	}
+
+	MasterDocument(int dep, 
+		int num, 
+		Date date, 
+		Commander comm, 
+		Soldier sol, 
+		String title){
+		// here's nothing
+	}
+	
 	MasterDocument(int dep, 
 		int num, 
 		Date date, 

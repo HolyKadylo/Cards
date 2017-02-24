@@ -5,11 +5,10 @@ package com.kadylo.kmdb;
 
 public class Application{
 	public static void main(String[] args){
-		// receive login with ID
-		// creating worker from db
-		// receive change state
-		// changing state, making adjsutments to db
-		// receive request
-		// selecting from db, providing
+		System.out.println("=========Testing Application.class=========\n");
+		DataBase db = DataBase.access();
+		Soldier sol = db.getSoldier(1703);
+		System.out.println(sol.getFirstName() + " " + sol.getLastName() + " " + sol.getDepartment());
+		System.out.println("=========Application.class tested=========\n");
 	}
 }
