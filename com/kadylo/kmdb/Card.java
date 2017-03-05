@@ -78,7 +78,9 @@ public class Card extends MasterCard{
 		pushed = new HashMap <Commander, Boolean>();
 
 		/*Except for this one, we need it 'cause there is nowhere else to change it*/
-		pushed.put(chiefController, false);
+		//pushed
+		// 'cause it has to be filled after creation
+		//.put(chiefController, false);
 	}
 
 	Card(Commander chief, 
@@ -99,7 +101,7 @@ public class Card extends MasterCard{
 		chiefController = chief;
 		created = new Date();			// Card has actual creation date as well
 							// as Signature
-		closed = null;				// Creates without Signature so with
+		closed = new Date(0);			// Creates without Signature so with
 							// null closed value
 		closedSign = new Signature (chiefController);
 		this.primaryExecutor = primaryExecutor;
@@ -273,9 +275,25 @@ public class Card extends MasterCard{
 		secondaryExecutors.put(executor, newTask);
 	};
 
-	/* getter methods*/
+	/* getter & setter methods*/
+	Signature getClosedSign(){
+		return closedSign;
+	}
+
+	HashMap <Commander, HashMap<Signature, String>> getSecondaryControllers(){
+		return secondaryControllers;
+	}	
+
+	HashMap <Soldier, String> getSecondaryExecutors(){
+		return secondaryExecutors;
+	};
+
 	String getId(){
 		return id;
+	}
+
+	void setId(String id){
+		this.id = id;
 	}
 
 	Commander getChiefController(){
@@ -286,12 +304,25 @@ public class Card extends MasterCard{
 		return created;
 	};
 
+	// used for test
+	void setClosed(long o){
+		closed = new Date(o);
+	};
+	
+	Date getDirective(){
+		return directive;
+	};
+
 	Date getClosed(){
 		return closed;
 	};
 
 	Document getDocument(){
 		return document;
+	};
+
+	void setTask(String task){
+		this.task = task;
 	};
 
 	String getTask(){
@@ -303,6 +334,20 @@ public class Card extends MasterCard{
 	};
 	
 	/*status methods & actions*/
+	boolean hasSecondaryControllers(){
+		if (secondaryControllers.isEmpty())
+			return false;
+		else
+			return true;
+	}
+
+	boolean hasSecondaryExecutors(){
+		if (secondaryExecutors.isEmpty())
+			return false;
+		else
+			return true;
+	}
+
 	String generateID(Date date){
 		Random rand = new Random();
 		int base = rand.nextInt(RANGE);
@@ -344,6 +389,7 @@ public class Card extends MasterCard{
 			throw new IllegalArgumentException(
 				"Trying to close card when not being chief or his master"
 			);*/
+
 		if (!chiefController.getPassword().equals(commander.getPassword()))
 			throw new IllegalArgumentException(	//TODO another exception??
 				"Trying to apply signature while providing incorrect password"
@@ -354,7 +400,6 @@ public class Card extends MasterCard{
 			);
 		closedSign = new Signature (chiefController);
 		closedSign.apply(pass);
-		
 	};
 
 	/*Vise with comment*/
@@ -405,18 +450,20 @@ public class Card extends MasterCard{
 		//HashMap<Signature, String> hm
 		//Set<Signature> set
 		Signature signatureToInsert = null;
+		
 		for (Signature signature : set){
 			try{
-				if (signature.isOwner(controller)){				//TODO EQUALS
-					signatureToInsert = signature;			// тут проблема бо ми модифікуємо не секондарі контролерс, а тупо якусь викладку з нього
-											// or not?
-					signatureToInsert.apply(pass);
+				if (signature.isOwner(controller)){				
+					signatureToInsert = signature;			
+					String task = hm.get(signature);
+					hm.remove(signature);	
+					signatureToInsert.apply(pass, comment);		// here where comment goes
+					hm.put(signatureToInsert, task);		
 				}
 			} catch (NullPointerException npe){
 				continue;
 			}
 		}
-		hm.put(signatureToInsert, comment);					//Here where the comment goes
 		secondaryControllers.put(controller, hm);
 	};
 
@@ -474,6 +521,49 @@ public class Card extends MasterCard{
 			);
 		pushed.put(commander, false);
 	};	
+
+	// only vises, not signature!
+	boolean getVised(Commander commander) throws
+		IllegalArgumentException{
+		if (commander == null)
+			throw new NullPointerException(
+				"Trying to get vised of the null commander"
+			);
+		if (!secondaryControllers.containsKey(commander) 
+			|| chiefController.equals(commander))
+			throw new IllegalArgumentException(
+				"Trying to get vised of non affected commander"
+			);
+		Set <Signature> signatures = secondaryControllers.get(commander). keySet();
+		for (Signature sign : signatures){
+			if (sign.isOwner(commander))
+				return sign.doesExist();
+		}
+		throw new IllegalArgumentException
+			("Commander was not found while figuring out was the card vised by him or not");
+	}
+
+	// returns comment of the vised card
+	String getComment(Commander commander) throws
+		IllegalArgumentException{
+		if (commander == null)
+			throw new NullPointerException(
+				"Trying to get comment of the null commander"
+			);
+		if (!secondaryControllers.containsKey(commander) 
+			|| chiefController.equals(commander))
+			throw new IllegalArgumentException(
+				"Trying to get comment of non affected commander"
+			);
+		Set <Signature> signatures = secondaryControllers.get(commander). keySet();
+		for (Signature sign : signatures){
+			if (sign.isOwner(commander)){
+				return sign.getComment();
+			}
+		}
+		throw new IllegalArgumentException
+			("Commander was not found while figuring out was said near comment");
+	}
 	
 	boolean getPushed(Commander commander) throws 
 		IllegalArgumentException{

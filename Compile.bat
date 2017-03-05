@@ -3,6 +3,7 @@ echo off
 cls
 type Start.txt
 javac -Xlint:all -cp .;"%CD%" "%CD%"/com/kadylo/kmdb/DataBase.java
+javac -Xlint:all -cp .;"%CD%" "%CD%"/com/kadylo/kmdb/Server.java
 javac -Xlint:all -cp .;"%CD%" "%CD%"/com/kadylo/kmdb/Application.java
 javac -Xlint:all -cp .;"%CD%" "%CD%"/com/kadylo/kmdb/Commander.java
 javac -Xlint:all -cp .;"%CD%" "%CD%"/com/kadylo/kmdb/Document.java

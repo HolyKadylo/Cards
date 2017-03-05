@@ -29,6 +29,11 @@ class Signature extends MasterSignature{
 	String password;
 	boolean exists;
 	
+	/*Creating existing signature withoud comment*/
+	Signature (Commander owner, String password){
+		this(owner, " ", password);
+	}
+
 	/* Creating existing signature with comment*/
 	Signature(Commander owner, String comment, String password){
 		super(owner, comment, password);
@@ -66,7 +71,7 @@ class Signature extends MasterSignature{
 	};
 
 	boolean isOwner(Commander candidate){
-		if (candidate == owner)		//TODO Verify with equals
+		if (candidate.equals(owner))
 			return true;
 		else
 			return false;

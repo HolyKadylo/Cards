@@ -270,6 +270,10 @@ public class Commander implements Commanders, Soldiers {
 	};
 
 	/*Setters*/
+	public void setId(int id){
+		this.id = id;
+	}
+
 	public void setFirstName(String s){
 		this.firstName = s;
 	}
