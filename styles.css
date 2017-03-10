@@ -1,0 +1,41 @@
+H1{/*Çàãîëîâîê ñòîð³íêè*/
+color:steelblue;
+text-align:center;
+font-size:250%;
+font-weight:bolder;
+text-decoration:underline;
+line-height:0.5;
+}
+hidden{
+display:none;
+}
+H2{/*Ïîÿñíåííÿ çàãîëîâêó ñòîð³íêè*/
+color:slategray;
+text-align:center;
+font-size:150%;
+font-weight:bold;}
+T1{/*Çàãîëîâîê òàáëèö³, ÓÂÀÃÀ! Â²Í Á²ËÈÉ*/
+color:white;
+text-align:center;
+font-weight:bolder;
+}
+aside{
+float:right;
+width:200px;
+background:steelblue;
+color:white;
+font-weight:bold;
+padding:10px;
+}
+T2{/*Ðåãóëÿðíèé òåêñò òàáëèö³*/
+color:dimgray;
+text-align:left;
+font-weight:bold;
+font-size:105%;
+}
+A:visited{/*Â³äâ³äàíå ïîñèëàííÿ*/
+color:steelblue;
+}
+A:active{/*Àêòèâíå ïîñèëàííÿ*/
+color:red;
+}

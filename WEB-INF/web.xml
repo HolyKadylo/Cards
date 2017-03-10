@@ -69,12 +69,12 @@
 
     <servlet-mapping>
       <servlet-name>application</servlet-name>
-      <url-pattern>/</url-pattern>
+      <url-pattern>/auth</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
       <servlet-name>addCard</servlet-name>
-      <url-pattern>/addcard</url-pattern>
+      <url-pattern>/add</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -85,5 +85,9 @@
     <session-config>
       <session-timeout>30</session-timeout>    <!-- 30 minutes -->
     </session-config>
+
+    <welcome-file-list>
+        <welcome-file>login.html</welcome-file>
+    </welcome-file-list>
 
 </web-app>
