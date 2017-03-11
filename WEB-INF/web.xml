@@ -44,35 +44,34 @@
       <load-on-startup>5</load-on-startup>
     </servlet>
 
-    <servlet>
+    <!-- <servlet>
       <servlet-name>addCard</servlet-name>
       <description>
         This servlet is used when user wants to create a card
       </description>
       <servlet-class>com.kadylo.kmdb.ApplicationAddCard</servlet-class>
 
-      <!-- Load this servlet at server startup time -->
-      <!-- ms I hope-->
+      
       <load-on-startup>5</load-on-startup>
-    </servlet>
+    </servlet> -->
 
-    <servlet>
+    <!-- <servlet>
       <servlet-name>docDetails</servlet-name>
       <description>
         This servlet is used when user wants view the directive document
       </description>
       <servlet-class>com.kadylo.kmdb.ApplicationDocDetails</servlet-class>
 
-      <!-- Load this servlet at server startup time -->
+      
       <load-on-startup>5</load-on-startup>
-    </servlet>
+    </servlet> -->
 
     <servlet-mapping>
       <servlet-name>application</servlet-name>
       <url-pattern>/auth</url-pattern>
     </servlet-mapping>
 
-    <servlet-mapping>
+   <!--  <servlet-mapping>
       <servlet-name>addCard</servlet-name>
       <url-pattern>/add</url-pattern>
     </servlet-mapping>
@@ -80,7 +79,7 @@
     <servlet-mapping>
       <servlet-name>docDetails</servlet-name>
       <url-pattern>/viewdoc</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping> -->
 
     <session-config>
       <session-timeout>30</session-timeout>    <!-- 30 minutes -->
@@ -89,5 +88,15 @@
     <welcome-file-list>
         <welcome-file>login.html</welcome-file>
     </welcome-file-list>
+	
+	<!--<error-page>
+		<exception-type>java.lang.Throwable</exception-type>
+		<location>/WEB-INF/html/error.html</location>
+	</error-page>
+	
+	<error-page>
+		<error-code>404</error-code>
+		<location>/WEB-INF/html/error.html</location>
+	</error-page>-->
 
 </web-app>

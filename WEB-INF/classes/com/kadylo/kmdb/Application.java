@@ -34,13 +34,23 @@ public class Application extends HttpServlet{
 		// print session info
 		Date created = new Date(session.getCreationTime());
 		Date accessed = new Date(session.getLastAccessedTime());
+		out.println("<!DOCTYPE html><html><head><title>CARDS</title><meta charset = \"UTF-8\"></head>");
 		out.println("ID " + session.getId());
 		out.println(" Created: " + created);
 		out.println(" Last Accessed: " + accessed);
+		
+		System.out.println("HELLO");
+		try{
+			DataBase db = DataBase.access();
+			Soldier sol = db.getSoldier(1703);
+			out.println(sol.getFirstName() + " " + sol.getLastName() + " " + sol.getDepartment());
+		} catch (Exception e){
+			e.printStackTrace();
+			System.out.println(e.toString());
+		}
+		
 		out.println(" LOG: " + request.getParameter("login"));
 		out.println(" PASS: " + request.getParameter("pass"));
-		Commander com = DataBase.access().getCommander(Integer.parseInt(request.getParameter("login")));
-		out.println(" NAME: " + com.getFirstName());
 		
 
 		// set session info if needed
@@ -49,14 +59,6 @@ public class Application extends HttpServlet{
 			String dataValue = request.getParameter("dataValue");
 			session.setAttribute(dataName, dataValue);
 		}
-
-		// print session contents
-		/*Enumeration e = session.getAttributeNames();
-		while (e.hasMoreElements()) {
-			String name = (String)e.nextElement();
-			String value = session.getAttribute(name).toString();
-			out.println(name + " = " + value);
-		}*/
 	}
 
 	/* Test */
