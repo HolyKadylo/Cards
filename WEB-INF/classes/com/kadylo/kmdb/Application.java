@@ -26,7 +26,8 @@ public class Application extends HttpServlet{
 	/*http://localhost:8080/examples/servlets/sessions.html */
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException {
-		response.setContentType("text/html");
+		response.setContentType("text/html; charset=UTF-8");
+		//response.setCharacterEncoding("UTF-8");
 		PrintWriter out = response.getWriter();
 
 		HttpSession session = request.getSession(true);
@@ -34,7 +35,7 @@ public class Application extends HttpServlet{
 		// print session info
 		Date created = new Date(session.getCreationTime());
 		Date accessed = new Date(session.getLastAccessedTime());
-		out.println("<!DOCTYPE html><html><head><title>CARDS</title><meta charset = \"UTF-8\"></head>");
+		out.println("<!DOCTYPE html><html><head><title>CARDS</title></head><body>");
 		out.println("ID " + session.getId());
 		out.println(" Created: " + created);
 		out.println(" Last Accessed: " + accessed);
@@ -43,6 +44,11 @@ public class Application extends HttpServlet{
 		try{
 			DataBase db = DataBase.access();
 			Soldier sol = db.getSoldier(1703);
+			
+			//http://stackoverflow.com/questions/8278287/how-to-print-utf-8-in-jsp
+			//new String(query.getBytes(),"UTF-8")
+			// ISO-8859 -- Windows encoding
+			//out.println(new String(sol.getFirstName().getBytes("windows-1251"),"UTF-8") + " " + new String(sol.getLastName().getBytes("windows-1251"), "UTF-8") + " " + sol.getDepartment());
 			out.println(sol.getFirstName() + " " + sol.getLastName() + " " + sol.getDepartment());
 		} catch (Exception e){
 			e.printStackTrace();
@@ -51,7 +57,7 @@ public class Application extends HttpServlet{
 		
 		out.println(" LOG: " + request.getParameter("login"));
 		out.println(" PASS: " + request.getParameter("pass"));
-		
+		out.println("</body></html>");
 
 		// set session info if needed
 		String dataName = request.getParameter("dataName");
@@ -67,7 +73,12 @@ public class Application extends HttpServlet{
 		DataBase db = DataBase.access();
 		Soldier sol = db.getSoldier(1703);
 		System.out.println(sol.getFirstName() + " " + sol.getLastName() + " " + sol.getDepartment());
-
+		try{
+			System.out.println("testing encoding: ");
+			System.out.println(new String(sol.getFirstName().getBytes(),"UTF-8") + " " + new String(sol.getLastName().getBytes(), "UTF-8") + " " + sol.getDepartment());
+		} catch (UnsupportedEncodingException e){
+			System.out.println("Unsupported encoding");
+		}
 		Card card = DataBase.access().getCard("12");
 		System.out.println("OUT-CHI: " + card.getChiefController().getId());
 		System.out.println("OUT-PRI: " + card.getPrimaryExecutor().getId());

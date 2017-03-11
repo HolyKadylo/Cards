@@ -30,7 +30,7 @@ public class DataBase{
 	private static String PATH_TO_DB = "resources/KMDB.accdb";
 	
 	//temporary TODO fix
-	private static final String PROPFILE = "D:\Program Files\Java\apache-tomcat-9.0.0.M17\webapps\cards\WEB-INF\classes\resources";
+	private static final String PROPFILE = "D:/Program Files/Java/apache-tomcat-9.0.0.M17/webapps/cards/WEB-INF/classes/resources/DBProps.properties";
 	private static final String password = "PsSwRd";
 	private static final String EXPECTED_POOL_SIGNATURE = "tH15_is=15_THthee_eexXxqeCcded==p00L-51gn1tuR";
 
