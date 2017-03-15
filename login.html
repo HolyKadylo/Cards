@@ -18,17 +18,21 @@
 
 			if (url.includes(noSuchLogin)){
 				alert("Такой логин не найден")
+				window.location.href = "/cards/login.html"
 			}
 			if (url.includes(wrongPassword)){
 				alert("Неверный пароль")
+				window.location.href = "/cards/login.html"
 			}
 			if (url.includes(somethingWrong)){
 				alert("Неверный логин или пароль")
+				window.location.href = "/cards/login.html"
 			}
 			if (url.includes(fatalErr)){
 				alert("Неизвестная ошибка приложения")
+				window.location.href = "/cards/login.html"
 			}
-			window.location.href = "/cards/login.html"
+			
 		</script>
 		<h2>Введите идентификационные данные</h2><br>
 		<form action="auth" method=POST style = "text-align:center">
