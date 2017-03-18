@@ -12,12 +12,12 @@
 			var url = window.location.href
 
 			var noSuchLogin = "?msg=lgn"
-			var wrongPassword = "?msg=psw"
+			var wrongPassword = "?msg=psd"
 			var somethingWrong = "?msg=pswlgn"
 			var fatalErr = "?msg=err"
 
 			if (url.includes(noSuchLogin)){
-				alert("Такой логин не найден")
+				alert("Неверный логин или пароль")
 				window.location.href = "/cards/login.html"
 			}
 			if (url.includes(wrongPassword)){

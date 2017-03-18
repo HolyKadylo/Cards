@@ -11,23 +11,12 @@ import java.util.NoSuchElementException;
 
 public class Application extends HttpServlet{
 	private static final long serialVersionUID = 1L;
-
-	// FN is for FileName
-	private static final String loginFN = "login page.html";
-	private static final String stylesFN = "styles.css";
-
-	// cookieValue + whenToDelete
-	private static HashMap <String, Date> validCookies = new HashMap <String, Date>();
-
-	// sends login page to user
-	public void sendLogin(){
-
-	}
 	
 	/*http://localhost:8080/examples/servlets/sessions.html */
 	// ../auth
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException {
+		boolean wasRedirected = false;
 		response.setContentType("text/html; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession(true);
@@ -65,7 +54,7 @@ public class Application extends HttpServlet{
 				soldier = 	db.getSoldier(Integer.parseInt(password));
 				System.out.println("LOGIN: " + login);
 				System.out.println("ACTUAL: " + soldier.getFirstName() + " " + soldier.getLastName());
-				if (!login.equals(soldier.getFirstName() + " " + soldier.getLastName())){
+				if (!login.equals(soldier.getLastName() + " " + soldier.getFirstName())){
 					System.out.println("Throwing \"wrong login or password\"");
 					throw new IllegalArgumentException("Wrong login or password");	
 				}
@@ -74,33 +63,38 @@ public class Application extends HttpServlet{
 		} catch (NoSuchElementException nsee){
 			
 			//means that there is no such login
+			wasRedirected = true;
 			response.sendRedirect("login.html?msg=lgn");
 		} catch (IllegalArgumentException iae){
 
 			// means wrong password or wrong password and login
-			if(iae.toString().equals("Wrong password"))
-				response.sendRedirect("login.html?msg=psw");
-			if(iae.toString().equals("Wrong login or password"))
+			if(iae.toString().equals("Wrong password")){
+				wasRedirected = true;
+				response.sendRedirect("login.html?msg=psd");
+			} else {
+				wasRedirected = true;
 				response.sendRedirect("login.html?msg=pswlgn");
+			} 
 		} catch (Exception e){
 
 			// means something unexpected
 			e.printStackTrace();
 			System.out.println(e.toString());
+			wasRedirected = true;
 			response.sendRedirect("error.html?msg=err");
 		}
 		out.println("</body></html>");
 
-		// set session info if needed
-		String dataName = request.getParameter("dataName");
-		if (dataName != null && dataName.length() > 0) {
-			String dataValue = request.getParameter("dataValue");
-			session.setAttribute(dataName, dataValue);
+		if (!wasRedirected){
+			// means authorized
+			session.setAttribute("authorized", "true");
 		}
 	}
 
 	/* Test */
 	public static void main(String[] args){
+		
+		// we are leaving here an old name
 		System.out.println("=========Testing Application.class=========\n");
 		DataBase db = DataBase.access();
 		Soldier sol = db.getSoldier(1703);

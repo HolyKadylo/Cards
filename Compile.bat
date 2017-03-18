@@ -15,6 +15,7 @@ javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF
 javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/Card.java
 javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/Commanders.java
 javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/Soldiers.java
+javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/EncodingFilter.java
 ECHO 
 pause
 echo on
