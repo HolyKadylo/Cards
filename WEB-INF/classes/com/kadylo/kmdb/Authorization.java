@@ -1,5 +1,5 @@
 /** @author Illya Piven
- * This class is used to run the whole application
+ * This class is used as the gate to the whole application
  */
 package com.kadylo.kmdb;
 
@@ -9,7 +9,7 @@ import javax.servlet.*;
 import javax.servlet.http.*;
 import java.util.NoSuchElementException;
 
-public class Application extends HttpServlet{
+public class Authorization extends HttpServlet{
 	private static final long serialVersionUID = 1L;
 	
 	/*http://localhost:8080/examples/servlets/sessions.html */
@@ -20,6 +20,7 @@ public class Application extends HttpServlet{
 		response.setContentType("text/html; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession(true);
+		session.setAttribute("authorized", "false");
 		DataBase db = DataBase.access();		
 
 		// print session info
@@ -33,7 +34,7 @@ public class Application extends HttpServlet{
 			try{
 				System.out.println("Trying integer login");				
 
-				// true when login is tabel number
+				// true when login is tabel number used for Commanders
 				int log = Integer.parseInt(login);
 				soldier = db.getSoldier(log);
 				commander = db.getCommander(log);	
@@ -45,12 +46,14 @@ public class Application extends HttpServlet{
 					System.out.println("Throwing \"wrong password\"");
 					throw new IllegalArgumentException ("Wrong password");
 				}
-				System.out.println("Successfully tried integer login");				
+				
+				// if everyting is OK, setting role
+				session.setAttribute("role", "commander");
 			} catch (NumberFormatException nfe){
 				System.out.println("Catching NumberFormatException");				
 
 				// means that name was inserted
-				// therefore retreiving only soldier
+				// therefore retreiving only Soldier
 				soldier = 	db.getSoldier(Integer.parseInt(password));
 				System.out.println("LOGIN: " + login);
 				System.out.println("ACTUAL: " + soldier.getFirstName() + " " + soldier.getLastName());
@@ -58,6 +61,9 @@ public class Application extends HttpServlet{
 					System.out.println("Throwing \"wrong login or password\"");
 					throw new IllegalArgumentException("Wrong login or password");	
 				}
+				
+				// if everyting is OK, setting role
+				session.setAttribute("role", "soldier");
 			}
 
 		} catch (NoSuchElementException nsee){
@@ -86,8 +92,18 @@ public class Application extends HttpServlet{
 		out.println("</body></html>");
 
 		if (!wasRedirected){
+			
 			// means authorized
 			session.setAttribute("authorized", "true");
+			if (session.getAttribute("role").equals("commander")){
+				response.sendRedirect("/cards/dashboard");
+			} else {
+				if(session.getAttribute("role").equals("soldier")){
+					response.sendRedirect("/cards/dashboard");
+				} else {
+					response.sendRedirect("error.html?msg=err");
+				}
+			}
 		}
 	}
 
