@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Мои карты
+	</title>
+</head>
+<body>
+	<span id="allcards" style="float:left;width:30%;height:100%;">
+		<h2>Всего карт к исполнению: $numCardsToExecute</h2><br>
+		<list>
+			$listOfCardsToExecute
+		</list>
+		<h2>Всего карт к контролю: $numCardsToControll</h2><br>
+		<a href="/cards/addcard">[Добавить карту]</a>
+		<list>
+			$listOfCardsToControll
+		</list>
+	</span>
+
+	<span id="head">Здравствуйте, <b>$username</b>
+		<a href="/cards/logout">[Выйти]</a><br><br>
+	</span><br>
+
+	$content
+
+</body>
+</html>

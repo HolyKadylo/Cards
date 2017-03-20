@@ -21,6 +21,9 @@ public class Authorization extends HttpServlet{
 		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession(true);
 		session.setAttribute("authorized", "false");
+
+		// means "no tabel number"
+		session.setAttribute("tabelNumber", -1895);
 		DataBase db = DataBase.access();		
 
 		// print session info
@@ -96,9 +99,15 @@ public class Authorization extends HttpServlet{
 			// means authorized
 			session.setAttribute("authorized", "true");
 			if (session.getAttribute("role").equals("commander")){
+
+				// setting tabel number & redirecting
+				session.setAttribute("tabelNumber", Integer.parseInt(login));
 				response.sendRedirect("/cards/dashboard");
 			} else {
 				if(session.getAttribute("role").equals("soldier")){
+
+					//setting soldier tabel number & redirecting
+					session.setAttribute("tabelNumber", Integer.parseInt(password));
 					response.sendRedirect("/cards/dashboard");
 				} else {
 					response.sendRedirect("error.html?msg=err");

@@ -63,6 +63,14 @@
 		<servlet-class>com.kadylo.kmdb.SoldierManager</servlet-class>
 	</servlet>
 
+	<servlet>
+		<servlet-name>logout</servlet-name>
+		<description>
+		This servlet is used when someone wants to close the session
+		</description>
+		<servlet-class>com.kadylo.kmdb.Logouter</servlet-class>
+	</servlet>
+
     <!-- <servlet>
       <servlet-name>addCard</servlet-name>
       <description>
@@ -90,21 +98,26 @@
       <url-pattern>/auth</url-pattern>
     </servlet-mapping>
 	
-	<servlet-mapping>
+    <servlet-mapping>
       <servlet-name>commanderManager</servlet-name>
       <url-pattern>/commandermanager</url-pattern>
     </servlet-mapping>
 	
-	<servlet-mapping>
+    <servlet-mapping>
       <servlet-name>soldierManager</servlet-name>
       <url-pattern>/soldiermanager</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>logout</servlet-name>
+      <url-pattern>/logout</url-pattern>
     </servlet-mapping>
 	
 	
 
    <!--  <servlet-mapping>
       <servlet-name>addCard</servlet-name>
-      <url-pattern>/add</url-pattern>
+      <url-pattern>/addcard</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
