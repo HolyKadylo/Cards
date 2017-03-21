@@ -3,7 +3,7 @@
  * Needs to be placed in path without spaces.
  */
 package com.kadylo.kmdb;
-це через пост-гет
+
 import java.io.*;
 import java.util.*;
 import javax.servlet.*;
@@ -22,6 +22,49 @@ public class CommanderManager extends HttpServlet{
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException {
 		System.out.println("Doing commander POST");
+		DataBase db = DataBase.access();
+		String executionFocus;
+		{
+			executionFocus = request.getParameter("executionFocus");
+		}
+		Card card = db.getCard(executionFocus);
+		
+		String changeEx;
+		Soldier soldierToModify = null;
+		{
+			changeEx = request.getParameter("changeEx");
+		}
+		try{
+			if (changeEx != null){
+				soldierToModify = db.getSoldier(Integer.parseInt(changeEx));
+			}
+		} catch (NoSuchElementException nsee) {
+
+			//nothing 
+		}
+		
+		// this will be the new task
+		String newTask = null;
+		{
+			newTask = request.getParameter("newTask");
+		}
+		try{
+			if (newTask != null){
+				card.changeTask(soldierToModify, newTask);
+				// putting card back
+				try{
+					db.addCard(card);
+				} catch (SQLException e){
+					//TODO alert
+				}
+			}
+		} catch (NoSuchElementException nsee) {
+
+			//nothing 
+		}
+		request.setAttribute("modified", "ok");
+		doGet(request, response);
+			
 		/* response.setContentType("text/html; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession(true);
@@ -140,30 +183,21 @@ public class CommanderManager extends HttpServlet{
 					//nothing 
 				}
 
-				// this will be the new task
-				String newTask = null;
-				{newTask = request.getParameter("newTask");
-				System.out.println("newTask: " + newTask);
-				}
+				boolean wasModified = false;
 				try{
-					if (newTask != null){
-						card.changeTask(db.getSoldier(Integer.parseInt(deleteEx)), newTask);
-						// putting card back
-						try{
-							db.addCard(card);
-						} catch (SQLException e){
-							//TODO alert
-						}
-					}
-				} catch (NoSuchElementException nsee) {
-
-					//nothing 
+					wasModified = request.getAttribute("modified").equals("ok");
+				}catch (NullPointerException npe){
+					wasModified = false;
+					request.setAttribute("modified", "notok");
 				}
+				
 				for(Soldier secondExecutor : card.getSecondaryExecutors().keySet()){
-					if (!secondExecutor.equals(soldierToModify))
+					if (!secondExecutor.equals(soldierToModify) || wasModified ){
 						listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": " + card.getSecondaryExecutors().get(secondExecutor) + "<br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><a href=\"?executionFocus=" + card.getId() + "&changeEx=" + String.valueOf(secondExecutor.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
-					if (secondExecutor.equals(soldierToModify))
+						request.setAttribute("modified", "notok");
+					} else {
 						listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newTask\" placeholder=\"" + card.getSecondaryExecutors().get(secondExecutor) + "\"><br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
+					}
 				}
 				content = content.replace("$listOfSecondaryExecutors", listOfSecondaryExecutors);
 				commanderString = commanderString.replace("$content", content);
