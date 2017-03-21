@@ -1,16 +1,13 @@
 	<span id="details" style="float:right;width:69%;height:100%;">
 	<h3>Карта $cardCode -- $cardName</h3><br>
 	Контролирующий <b>$chiefController</b><br>
-	Директивный срок исполнения <b>$directiveDate</b> [Осталось $workDaysRemain рабочих и $calendarDaysRemain календарных дней]<br>
-	Документ <b>$docCode: <a href="/cards/viewdoc">$docTag</a></b> [Исполнитель $docStar, $docStarDepartment отдел]<br>
+	Директивный срок исполнения <b>$directiveDate</b> [Осталось $daysRemain дней]<br>
+	Документ <b>$docCode: <a href="/cards/viewdoc">$docTag</a></b> [Исполнитель $docStar, $dStarDepartment отдел]<br>
 	<br>
 	Содержание пункта: $cardTask<br><br>
 	<b>Вы расписали задание следующим сотрудникам:</b><br><br>
 	<list>
-	$listOfSecondaryExecutors
-	<li><strike>Кондратьев: провести осмотр на предмет наличия наших групп</strike> <b>Выполнено: 20.02.2017</b> [За 4 дня до срока]<br><a href="123">[Убрать][Изменить формулировку]</a><br>.</li>
-	<li>Кондратьев: провести осмотр групп и фотографирование дефектов. <b>Срок: 24.02.2017</b> [Осталось 4 рабочих дня]<br><a href="123">[Убрать][Изменить формулировку][Отметить как выполненное]</a><br>.</li>
-	<li>Кириченко: документирование и отчет. <b>Срок: 29.02.2017</b> [Осталось 7 рабочих и 9 календарных дней]<br><a href="123">[Убрать][Изменить формулировку][Отметить как выполненное]</a><br>.</li>
+		$listOfSecondaryExecutors
 	<li><a href="/cards/addexecutor">[Добавить]</a><br>.</li>
 	</list>
 	</span>
