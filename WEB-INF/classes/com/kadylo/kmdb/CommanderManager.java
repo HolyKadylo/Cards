@@ -18,6 +18,9 @@ public class CommanderManager extends HttpServlet{
 	private static final String PATH_TO_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderTemplate.html";
 	private static final String PATH_TO_CONTENT_PREVIEW_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardPreview.txt";
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
+
+	// contains single line of salt that is added to the "password"
+	private static final String PATH_TO_SALT = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "classes/resources/salt.txt";
 	
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException {
@@ -28,6 +31,7 @@ public class CommanderManager extends HttpServlet{
 			executionFocus = request.getParameter("executionFocus");
 		}
 		Card card = db.getCard(executionFocus);
+		session.setAttribute("cardFocus", executionFocus);
 		
 		String changeEx;
 		Soldier soldierToModify = null;
@@ -109,19 +113,20 @@ public class CommanderManager extends HttpServlet{
 		commanderString = commanderString.replace("$username", commander.getFirstName());
 		commanderString = commanderString.replace("$numCardsToExecute", String.valueOf(soldier.getCardsToExecute().size()));
 		commanderString = commanderString.replace("$numCardsToControll", String.valueOf(commander.getCardsToControll().size()));
-
+		
 		// forming cards to execute
 		String cardsToExecuteList = "";
 		String executionFocus;
 		{executionFocus = request.getParameter("executionFocus");}
+		session.setAttribute("cardFocus", executionFocus);
 		if ( executionFocus == null)
 			executionFocus = " ";
 		for (String tag : soldier.getCardsToExecute()){
 
 			// means that it was selected
 			if (executionFocus.equals(db.getCard(tag).getId())){
-				Card card = db.getCard(tag);
-				
+				Card card = db.getCard(tag);		
+
 				// this executor will be deleted;
 				String deleteEx;
 				{deleteEx = request.getParameter("deleteEx");}
@@ -199,9 +204,34 @@ public class CommanderManager extends HttpServlet{
 						listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newTask\" placeholder=\"" + card.getSecondaryExecutors().get(secondExecutor) + "\"><br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
 					}
 				}
+				// content = content.replace("$thisCard", card.getId());
 				content = content.replace("$listOfSecondaryExecutors", listOfSecondaryExecutors);
 				commanderString = commanderString.replace("$content", content);
-			
+				commanderString = commanderString.replace("$cardFocus", card.getId());	
+				// commanderString = commanderString.replace("$isDisabledPushChief", String.valueOf(!card.getPushed(card.getChiefController())));
+				
+				//now making secondary controllers
+				// in order to not providing in HTML response commander's tabel number,
+				// we are going to replace them with salted hash
+				File saltFile = new File(PATH_TO_SALT);
+				String salt = FileUtils.readFileToString(saltFile, "windows-1251");
+
+				String secondaryControllersString = " ";
+				//HashMap <Commander, HashMap<Signature, String>> getSecondaryControllers(){
+				for (Commander comd : card.getSecondaryControllers().keySet()){
+					for (Signature signature : card.getSecondaryControllers().get(comd).keySet()){
+							
+						// means was signed
+						if (signature.doesExist()){
+							secondaryControllersString = secondaryControllersString + comd.getLastName() + ": <strike>" + card.getSecondaryControllers().get(comd).get(signature) + "</strike> Подписано " + dateFormat.format(signature.getApplied()) + "<br>Комментарий: " + signature.getComment() + "<br><br>";
+							continue;
+						}
+						String encodedCommanderTag = String.valueOf(comd.getId()) + salt;
+						secondaryControllersString = secondaryControllersString + "<input type=\"submit\" method=\"GET\" name=\"pushTo" + encodedCommanderTag.hashCode() + "\" value=\"Подать на рассмотрение\"></input>" + comd.getLastName() + " контролирует пункт " + card.getSecondaryControllers().get(comd).get(signature) + "<br>";
+					}
+				}
+				commanderString = commanderString.replace("$secondaryControllers", secondaryControllersString);
+	
 			// means that it wasn't selected
 			} else {
 				try{
@@ -219,6 +249,7 @@ public class CommanderManager extends HttpServlet{
 		{controllFocus = request.getParameter("controllFocus");}
 		if (controllFocus == null)
 			controllFocus = " ";
+		session.setAttribute("cardFocus", controllFocus);
 		for (String tag : commander.getCardsToControll()){
 			if (controllFocus.equals(db.getCard(tag).getId())){
 				Card card = db.getCard(tag);
@@ -243,9 +274,25 @@ public class CommanderManager extends HttpServlet{
 		}
 		commanderString = commanderString.replace("$listOfCardsToControll", cardsToControllList);
 
-		// if $content was not modified, replacing will default value
+		// if $content was not modified, replacing with short values
 		try {
-			commanderString = commanderString.replace("$content", "Здесь будут отображаться ваши карты");
+			Card cardF = db.getCard(session.getAttribute("cardFocus"));
+			String secondaryPushedTag = "";
+			for (Commander candidate : cardF.getSecondaryControllers().keySet()){
+				secondaryPushedTag = String.valueOf(candidate.getId()) + salt;
+				int hash = secondaryPushedTag.hashCode();
+				if (request.getParameter("chiefPush").equals("Подать на рассмотрение")){
+					cardF.push(cardF.getChiefController());
+					db.addCard(cardF);
+					commanderString = commanderString.replace("$content", "Карта подана на рассмотрение главному контролирующему");
+				} else if (request.getParameter("pushTo" + String.valueOf(hash)).equals("Подать на рассмотрение")){
+					cardF.push(candidate);
+					db.addCard(cardF);
+					commanderString = commanderString.replace("$content", "Карта подана на рассмотрение контролирующему");
+				} else {
+					commanderString = commanderString.replace("$content", "Здесь будут отображаться ваши карты");
+				}
+			}
 		} catch (Exception e){
 			System.out.println("Exception when modifying $content: " + e.toString());
 		}

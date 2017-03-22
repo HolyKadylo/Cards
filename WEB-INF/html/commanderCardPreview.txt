@@ -1,6 +1,9 @@
 	<span id="details" style="float:right;width:69%;height:100%;">
 	<h3>Карта $cardCode -- $cardName</h3><br>
-	Контролирующий <b>$chiefController</b><br>
+	<form action="/cards/dashboard>
+	Контролирующий <b>$chiefController</b> <input type="submit" name="chiefPush" value="Подать на рассмотрение"></input><br>
+	$secondaryControllers
+	</form>
 	Директивный срок исполнения <b>$directiveDate</b> [Осталось $daysRemain дней]<br>
 	Документ <b>$docCode: <a href="/cards/viewdoc">$docTag</a></b> [Исполнитель $docStar, $dStarDepartment отдел]<br>
 	<br>
@@ -8,6 +11,6 @@
 	<b>Вы расписали задание следующим сотрудникам:</b><br><br>
 	<list>
 		$listOfSecondaryExecutors
-	<li><a href="/cards/addexecutor">[Добавить]</a><br>.</li>
+	<li><a href="/cards/addexecutor?focus=$cardFocus">[Добавить]</a><br>.</li>
 	</list>
 	</span>

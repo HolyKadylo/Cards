@@ -53,6 +53,15 @@
 		</description>
 		<servlet-class>com.kadylo.kmdb.CommanderManager</servlet-class>
 	</servlet>
+
+	<servlet>
+		<servlet-name>addExecutor</servlet-name>
+		<description>
+		This servlet is used for people to add executors to the
+		previous focused card
+		</description>
+		<servlet-class>com.kadylo.kmdb.AdderExecutors</servlet-class>
+	</servlet>
 	
 	<servlet>
 		<servlet-name>soldierManager</servlet-name>
@@ -111,6 +120,11 @@
     <servlet-mapping>
       <servlet-name>logout</servlet-name>
       <url-pattern>/logout</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>addExecutor</servlet-name>
+      <url-pattern>/addexecutor</url-pattern>
     </servlet-mapping>
 	
 	

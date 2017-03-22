@@ -260,7 +260,7 @@ public class DataBase{
 			};
 		} catch (SQLException e){
 			if (e.toString().contains("ResultSet is empty"))
-				throw new NoSuchElementException("Failed to get document from DB because provided id was not found");
+				throw new NoSuchElementException("Failed to get card from DB because provided id was not found");
 			System.out.println("DB issue: " + e.toString());	
 			System.exit(0);
 		}
