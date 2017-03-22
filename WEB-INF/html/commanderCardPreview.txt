@@ -1,6 +1,6 @@
 	<span id="details" style="float:right;width:69%;height:100%;">
 	<h3>Карта $cardCode -- $cardName</h3><br>
-	<form action="/cards/dashboard>
+	<form action="/cards/dashboard">
 	Контролирующий <b>$chiefController</b> <input type="submit" name="chiefPush" value="Подать на рассмотрение"></input><br>
 	$secondaryControllers
 	</form>

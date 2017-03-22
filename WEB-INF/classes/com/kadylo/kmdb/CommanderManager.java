@@ -31,7 +31,7 @@ public class CommanderManager extends HttpServlet{
 			executionFocus = request.getParameter("executionFocus");
 		}
 		Card card = db.getCard(executionFocus);
-		session.setAttribute("cardFocus", executionFocus);
+		//session.setAttribute("cardFocus", executionFocus);
 		
 		String changeEx;
 		Soldier soldierToModify = null;
@@ -118,9 +118,14 @@ public class CommanderManager extends HttpServlet{
 		String cardsToExecuteList = "";
 		String executionFocus;
 		{executionFocus = request.getParameter("executionFocus");}
-		session.setAttribute("cardFocus", executionFocus);
-		if ( executionFocus == null)
+		
+		if ( executionFocus == null || executionFocus.equals("") || executionFocus.equals(" ")){
 			executionFocus = " ";
+		} else {
+			
+			// if not empty, adding
+			session.setAttribute("cardFocus", executionFocus);
+		}
 		for (String tag : soldier.getCardsToExecute()){
 
 			// means that it was selected
@@ -249,7 +254,7 @@ public class CommanderManager extends HttpServlet{
 		{controllFocus = request.getParameter("controllFocus");}
 		if (controllFocus == null)
 			controllFocus = " ";
-		session.setAttribute("cardFocus", controllFocus);
+		//session.setAttribute("cardFocus", controllFocus);
 		for (String tag : commander.getCardsToControll()){
 			if (controllFocus.equals(db.getCard(tag).getId())){
 				Card card = db.getCard(tag);
@@ -276,23 +281,45 @@ public class CommanderManager extends HttpServlet{
 
 		// if $content was not modified, replacing with short values
 		try {
-			Card cardF = db.getCard(session.getAttribute("cardFocus"));
+			File saltFile = new File(PATH_TO_SALT);
+			String salt = FileUtils.readFileToString(saltFile, "windows-1251");
+			System.out.println("Card in try: " + (String)session.getAttribute("cardFocus"));
+			Card cardF = db.getCard((String)session.getAttribute("cardFocus"));
 			String secondaryPushedTag = "";
 			for (Commander candidate : cardF.getSecondaryControllers().keySet()){
 				secondaryPushedTag = String.valueOf(candidate.getId()) + salt;
 				int hash = secondaryPushedTag.hashCode();
-				if (request.getParameter("chiefPush").equals("ѕодать на рассмотрение")){
-					cardF.push(cardF.getChiefController());
-					db.addCard(cardF);
-					commanderString = commanderString.replace("$content", " арта подана на рассмотрение главному контролирующему");
-				} else if (request.getParameter("pushTo" + String.valueOf(hash)).equals("ѕодать на рассмотрение")){
-					cardF.push(candidate);
-					db.addCard(cardF);
-					commanderString = commanderString.replace("$content", " арта подана на рассмотрение контролирующему");
-				} else {
-					commanderString = commanderString.replace("$content", "«десь будут отображатьс€ ваши карты");
+				System.out.println("hash: " + hash);
+				System.out.println("reqHash: " + request.getParameter("pushTo" + String.valueOf(hash)));
+				boolean isPushedToChief = false;
+				boolean isPushedToSecondary = false;
+				try{
+					isPushedToChief = !request.getParameter("chiefPush").equals("")||!request.getParameter("chiefPush").equals(null)||!request.getParameter("chiefPush").equals(" ");
+					System.out.println("its chef!");
+				} catch (NullPointerException npe){
+					System.out.println("not a chef");
+				}
+				try{
+					isPushedToSecondary = !request.getParameter("pushTo" + String.valueOf(hash)).equals("")||!request.getParameter("pushTo" + String.valueOf(hash)).equals(" ")||!request.getParameter("pushTo" + String.valueOf(hash)).equals(null);
+					System.out.println("its him! " + candidate.getId());
+				} catch (NullPointerException npe){
+					System.out.println("not a " + candidate.getId());
+				}
+				if (isPushedToChief){
+						cardF.push(cardF.getChiefController());
+						db.addCard(cardF);
+						commanderString = commanderString.replace("$content", " арта подана на рассмотрение главному контролирующему");
+						break;
+					} else if (isPushedToSecondary){
+						cardF.push(candidate);
+						db.addCard(cardF);
+						commanderString = commanderString.replace("$content", " арта подана на рассмотрение контролирующему");
+						break;
 				}
 			}
+			commanderString = commanderString.replace("$content", "«десь будут отображатьс€ ваши карты");
+		} catch (NoSuchElementException nse){
+			commanderString = commanderString.replace("$content", "«десь будут отображатьс€ ваши карты");
 		} catch (Exception e){
 			System.out.println("Exception when modifying $content: " + e.toString());
 		}
