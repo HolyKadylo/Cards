@@ -91,7 +91,7 @@
       <load-on-startup>5</load-on-startup>
     </servlet> -->
 
-    <!-- <servlet>
+    <servlet>
       <servlet-name>docDetails</servlet-name>
       <description>
         This servlet is used when user wants view the directive document
@@ -100,7 +100,7 @@
 
       
       <load-on-startup>5</load-on-startup>
-    </servlet> -->
+    </servlet>
 
     <servlet-mapping>
       <servlet-name>authorization</servlet-name>
@@ -132,12 +132,12 @@
    <!--  <servlet-mapping>
       <servlet-name>addCard</servlet-name>
       <url-pattern>/addcard</url-pattern>
-    </servlet-mapping>
+    </servlet-mapping> -->
 
     <servlet-mapping>
       <servlet-name>docDetails</servlet-name>
       <url-pattern>/viewdoc</url-pattern>
-    </servlet-mapping> -->
+    </servlet-mapping>
 
     <session-config>
       <session-timeout>30</session-timeout>    <!-- 30 minutes -->
