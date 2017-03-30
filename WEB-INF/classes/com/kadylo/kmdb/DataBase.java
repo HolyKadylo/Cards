@@ -338,7 +338,7 @@ public class DataBase{
 			sold.setDepartment(department);
 			
 			// making cards to execute
-			TreeSet<String> cardsToExecute =  new TreeSet<String>();
+			TreeSet<String> cardsToExecute =  new TreeSet<String>();//***** рсдс опноеп декере
 			sentense = "SELECT id FROM Cards WHERE (primaryExecutor = ? OR secondaryExecutors IN (SELECT bunchOfExecutors FROM secondaryExecutors WHERE ids = ?)) AND archived = FALSE";
 			statement = connection.prepareStatement(sentense);
 			statement.setInt(1, id);

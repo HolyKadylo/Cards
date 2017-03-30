@@ -62,6 +62,23 @@
 		</description>
 		<servlet-class>com.kadylo.kmdb.AdderExecutors</servlet-class>
 	</servlet>
+
+	<servlet>
+		<servlet-name>addController</servlet-name>
+		<description>
+		This servlet is used for people to add controllers to the
+		previous focused card
+		</description>
+		<servlet-class>com.kadylo.kmdb.AdderControllers</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>anotherDateSetter</servlet-name>
+		<description>
+		This servlet is used when card is outdated
+		</description>
+		<servlet-class>com.kadylo.kmdb.AnotherDateSetter</servlet-class>
+	</servlet>
 	
 	<servlet>
 		<servlet-name>soldierManager</servlet-name>
@@ -78,6 +95,23 @@
 		This servlet is used when someone wants to close the session
 		</description>
 		<servlet-class>com.kadylo.kmdb.Logouter</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>secondaryViser</servlet-name>
+		<description>
+		This servlet is used to vise card
+		</description>
+		<servlet-class>com.kadylo.kmdb.SecondaryViser</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>chiefSign</servlet-name>
+		<description>
+		This servlet is used when someone wants sign card
+		while being a chief
+		</description>
+		<servlet-class>com.kadylo.kmdb.ChiefSign</servlet-class>
 	</servlet>
 
     <!-- <servlet>
@@ -97,8 +131,6 @@
         This servlet is used when user wants view the directive document
       </description>
       <servlet-class>com.kadylo.kmdb.ApplicationDocDetails</servlet-class>
-
-      
       <load-on-startup>5</load-on-startup>
     </servlet>
 
@@ -125,6 +157,26 @@
     <servlet-mapping>
       <servlet-name>addExecutor</servlet-name>
       <url-pattern>/addexecutor</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>addController</servlet-name>
+      <url-pattern>/addcontroller</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>anotherDateSetter</servlet-name>
+      <url-pattern>/setAnotherDate</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>secondaryViser</servlet-name>
+      <url-pattern>/secondaryVise</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+      <servlet-name>chiefSign</servlet-name>
+      <url-pattern>/chiefSign</url-pattern>
     </servlet-mapping>
 	
 	

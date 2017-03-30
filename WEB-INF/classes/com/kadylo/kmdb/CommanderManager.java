@@ -4,6 +4,8 @@
  */
 package com.kadylo.kmdb;
 
+//TODO WikiTables
+
 import java.io.*;
 import java.util.*;
 import javax.servlet.*;
@@ -16,7 +18,11 @@ public class CommanderManager extends HttpServlet{
 	private static final long serialVersionUID = 3L;
 	private static final String PATH = DataBase.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	private static final String PATH_TO_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderTemplate.html";
-	private static final String PATH_TO_CONTENT_PREVIEW_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardPreview.txt";
+	private static final String PATH_TO_EX_CONTENT_PREVIEW_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardExecutorPreview.txt";
+	private static final String PATH_TO_CO_CONTENT_PREVIEW_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardControllerPreview.txt";
+	private static final String PATH_TO_CH_CO_CONTENT_PREVIEW_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardChiefControllerPreview.txt";
+	private static final String PATH_TO_CH_CO_CONTENT_PREVIEW_TEMPLATE_SIGNED = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardChiefControllerPreviewSigned.txt";
+	private static final String PATH_TO_CO_CONTENT_PREVIEW_TEMPLATE_FORM = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/commanderCardControllerPreviewForm.txt";
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
 	// contains single line of salt that is added to the "password"
@@ -27,16 +33,26 @@ public class CommanderManager extends HttpServlet{
 		System.out.println("Doing commander POST");
 		DataBase db = DataBase.access();
 		String executionFocus;
+		String controllFocus;
 		{
 			executionFocus = request.getParameter("executionFocus");
+			controllFocus = request.getParameter("controllFocus");
 		}
-		Card card = db.getCard(executionFocus);
+		Card card = null;
+		if (executionFocus == null || executionFocus.equals("") || executionFocus.equals(" ")){
+			card = db.getCard(controllFocus);
+		} else {
+			card = db.getCard(executionFocus);
+		}
 		//session.setAttribute("cardFocus", executionFocus);
 		
 		String changeEx;
+		String changeCo;
 		Soldier soldierToModify = null;
+		Commander commanderToModify = null;
 		{
 			changeEx = request.getParameter("changeEx");
+			changeCo = request.getParameter("changeCo");
 		}
 		try{
 			if (changeEx != null){
@@ -46,8 +62,17 @@ public class CommanderManager extends HttpServlet{
 
 			//nothing 
 		}
+
+		try{
+			if (changeCo != null){
+				commanderToModify = db.getCommander(Integer.parseInt(changeCo));
+			}
+		} catch (NoSuchElementException nsee) {
+
+			//nothing 
+		}
 		
-		// this will be the new task
+		// this will be the new task*****
 		String newTask = null;
 		{
 			newTask = request.getParameter("newTask");
@@ -66,13 +91,33 @@ public class CommanderManager extends HttpServlet{
 
 			//nothing 
 		}
+
+		String newCoTask = null;
+		{
+			newCoTask = request.getParameter("newCoTask");
+		}
+		try{
+			if (newCoTask != null){
+				card.changeTask(commanderToModify, newCoTask);
+				// putting card back
+				try{
+					db.addCard(card);
+				} catch (SQLException e){
+					//TODO alert
+				}
+			}
+		} catch (NoSuchElementException nsee) {
+
+			//nothing 
+		}
 		request.setAttribute("modified", "ok");
 		doGet(request, response);
 			
 		/* response.setContentType("text/html; charset=UTF-8");
 		PrintWriter out = response.getWriter();
 		HttpSession session = request.getSession(true);
-		
+		session.setAttribute("cardFocus", executionFocus);
+
 		// bouncing back unauthorized session
 		try{
 			if(session.getAttribute("authorized").equals("false")){
@@ -157,7 +202,7 @@ public class CommanderManager extends HttpServlet{
 				}
 
 				// printing selected card
-				File contentFile = new File(PATH_TO_CONTENT_PREVIEW_TEMPLATE);
+				File contentFile = new File(PATH_TO_EX_CONTENT_PREVIEW_TEMPLATE);
 				String content = FileUtils.readFileToString(contentFile, "windows-1251");
 				content = content.replace("$cardCode", card.getId());
 				try{
@@ -232,7 +277,7 @@ public class CommanderManager extends HttpServlet{
 							continue;
 						}
 						String encodedCommanderTag = String.valueOf(comd.getId()) + salt;
-						secondaryControllersString = secondaryControllersString + "<input type=\"submit\" method=\"GET\" name=\"pushTo" + encodedCommanderTag.hashCode() + "\" value=\"Подать на рассмотрение\"></input>" + comd.getLastName() + " контролирует пункт " + card.getSecondaryControllers().get(comd).get(signature) + "<br>";
+						secondaryControllersString = secondaryControllersString + "<input type=\"submit\" method=\"GET\" name=\"pushTo" + encodedCommanderTag.hashCode() + "\" value=\"Подать на рассмотрение\"></input>" + comd.getLastName() + ":<br> " + card.getSecondaryControllers().get(comd).get(signature) + "<br><br>";
 					}
 				}
 				commanderString = commanderString.replace("$secondaryControllers", secondaryControllersString);
@@ -252,12 +297,36 @@ public class CommanderManager extends HttpServlet{
 		String cardsToControllList = "";
 		String controllFocus;
 		{controllFocus = request.getParameter("controllFocus");}
-		if (controllFocus == null)
+		if ( controllFocus== null || controllFocus.equals("") || controllFocus.equals(" ")){
 			controllFocus = " ";
-		//session.setAttribute("cardFocus", controllFocus);
+		} else {
+		
+			// if not empty, adding
+			session.setAttribute("cardFocus", controllFocus);
+		}
 		for (String tag : commander.getCardsToControll()){
 			if (controllFocus.equals(db.getCard(tag).getId())){
 				Card card = db.getCard(tag);
+
+				// this commander will be deleted;
+				String deleteCo;
+				{deleteCo = request.getParameter("deleteCo");}
+				try{
+					if (deleteCo != null){
+						card.removeController(db.getCommander(Integer.parseInt(deleteCo)));
+
+						// putting card back
+						try{
+							db.addCard(card);
+						} catch (SQLException e){
+							//TODO alert
+						}
+					}
+				} catch (NoSuchElementException nsee) {
+
+					//nothing 
+				}
+
 				try{
 					cardsToControllList = cardsToControllList + "<li><b><a href = \"?controllFocus=" + card.getId() + "\">" + card.getTask().substring(0, 20) + "...</a></b></li>";
 				} catch (StringIndexOutOfBoundsException sioobe){
@@ -265,10 +334,143 @@ public class CommanderManager extends HttpServlet{
 				}
 
 				// printing selected card
-				File contentFile = new File(PATH_TO_CONTENT_PREVIEW_TEMPLATE);
-				String content = FileUtils.readFileToString(contentFile, "windows-1251");
-				//content = content.replace("$username", commander.getFirstName());
-				commanderString = commanderString.replace("$content", content);
+				// here we are using different templates 
+				// depending on whether user is chief or not
+				if (card.isChief(commander)){
+					
+// is chief
+					if (!card.getClosedSign().doesExist()){
+				
+						// means that card is open
+						File contentFile = new File(PATH_TO_CH_CO_CONTENT_PREVIEW_TEMPLATE);
+						String content = FileUtils.readFileToString(contentFile, "windows-1251");
+						content = content.replace("$cardCode", card.getId());
+						try{
+							content = content.replace("$cardName", card.getTask().substring(0, 20) + "...");
+						} catch (StringIndexOutOfBoundsException sioobe){
+							content = content.replace("$cardName", card.getTask());
+						}
+						content = content.replace("$directiveDate", dateFormat.format(card.getDirective()));
+						Date now = new Date();
+						content = content.replace("$cardFocus", card.getId());	
+						content = content.replace("$executor", card.getPrimaryExecutor().getLastName());
+						content = content.replace("$exDept", String.valueOf(card.getPrimaryExecutor().getDepartment()));
+						content = content.replace("$daysRemain", String.valueOf(1 + java.lang.Math.round((card.getDirective().getTime() - now.getTime())/1000/60/60/24)));
+						content = content.replace("$docCode", card.getDocument().getNumber() + "/" + card.getDocument().getDepartment());
+						content = content.replace("$docTag", card.getDocument().getTitle());
+						content = content.replace("$docStar", card.getDocument().getStar().getLastName());
+						content = content.replace("$dStarDepartment", String.valueOf(card.getDocument().getStar().getDepartment()));
+						content = content.replace("$cardTask", card.getTask());
+
+						// forming $listOfSecondaryControllers
+						String listOfSecondaryControllers = "";
+
+						// this executor will be modified;
+						String changeCo;
+						Commander commanderToModify = null;
+						{
+							changeCo = request.getParameter("changeCo");
+						}
+						try{
+							if (changeCo != null){
+								commanderToModify = db.getCommander(Integer.parseInt(changeCo));
+							}
+						} catch (NoSuchElementException nsee) {
+
+							//nothing 
+						}
+
+						boolean wasModified = false;
+						try{
+							wasModified = request.getAttribute("modified").equals("ok");
+						} catch (NullPointerException npe){
+							wasModified = false;
+							request.setAttribute("modified", "notok");
+						}
+				
+						for(Commander secondController : card.getSecondaryControllers().keySet()){
+							if (!secondController.equals(commanderToModify) || wasModified ){
+								for(Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
+									listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": " + card.getSecondaryControllers().get(secondController).get(sign) + "<br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><a href=\"?controllFocus=" + card.getId() + "&changeCo=" + String.valueOf(secondController.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
+									break;
+								}
+							request.setAttribute("modified", "notok");
+							} else {
+								for (Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
+									listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newCoTask\" placeholder=\"" + card.getSecondaryControllers().get(secondController).get(sign) + "\"><br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
+								}
+							}
+						}
+						// content = content.replace("$thisCard", card.getId());
+						content = content.replace("$listOfSecondaryControllers", listOfSecondaryControllers);
+						commanderString = commanderString.replace("$content", content);
+					} else {
+						
+						//means that card is closed
+						File contentFile = new File(PATH_TO_CH_CO_CONTENT_PREVIEW_TEMPLATE_SIGNED);
+						String content = FileUtils.readFileToString(contentFile, "windows-1251");
+						content = content.replace("$cardCode", card.getId());
+						try{
+							content = content.replace("$cardName", card.getTask().substring(0, 20) + "...");
+						} catch (StringIndexOutOfBoundsException sioobe){
+							content = content.replace("$cardName", card.getTask());
+						}
+						content = content.replace("$directiveDate", dateFormat.format(card.getDirective()));
+						Date now = new Date();
+						content = content.replace("$executor", card.getPrimaryExecutor().getLastName());
+						content = content.replace("$exDept", String.valueOf(card.getPrimaryExecutor().getDepartment()));
+						content = content.replace("$signDate",  dateFormat.format(card.getClosedSign().getApplied()));
+						content = content.replace("$docCode", card.getDocument().getNumber() + "/" + card.getDocument().getDepartment());
+						content = content.replace("$docTag", card.getDocument().getTitle());
+						content = content.replace("$docStar", card.getDocument().getStar().getLastName());
+						content = content.replace("$dStarDepartment", String.valueOf(card.getDocument().getStar().getDepartment()));
+						content = content.replace("$cardTask", card.getTask());
+	
+						// since we don't need it
+						content = content.replace("$listOfSecondaryControllers", " ");
+						commanderString = commanderString.replace("$content", content);
+					}
+				} else {
+					
+					// is not a chief
+					File contentFile = new File(PATH_TO_CO_CONTENT_PREVIEW_TEMPLATE);
+					String content = FileUtils.readFileToString(contentFile, "windows-1251");
+					content = content.replace("$chiefController", card.getChiefController().getLastName());
+					content = content.replace("$directiveDate", dateFormat.format(card.getDirective()));
+					content = content.replace("$cardCode", card.getId());
+					Date now = new Date();
+					content = content.replace("$daysRemain", String.valueOf(1 + java.lang.Math.round((card.getDirective().getTime() - now.getTime())/1000/60/60/24)));
+					content = content.replace("$executor", card.getPrimaryExecutor().getLastName());
+					content = content.replace("$exDept", String.valueOf(card.getPrimaryExecutor().getDepartment()));
+					content = content.replace("$docCode", card.getDocument().getNumber() + "/" + card.getDocument().getDepartment());
+					content = content.replace("$docTag", card.getDocument().getTitle());
+					content = content.replace("$docStar", card.getDocument().getStar().getLastName());
+					content = content.replace("$dStarDepartment", String.valueOf(card.getDocument().getStar().getDepartment()));
+					content = content.replace("$cardTask", card.getTask());
+					try{
+						content = content.replace("$cardName", card.getTask().substring(0, 20) + "...");
+					} catch (StringIndexOutOfBoundsException sioobe){
+						content = content.replace("$cardName", card.getTask());
+					}
+					
+					for (Signature sign : card.getSecondaryControllers().get(commander).keySet()){
+						content = content.replace("$whatToSecondaryControll", card.getSecondaryControllers().get(commander).get(sign));
+						break;
+					}
+					if (card.getVised(commander)){
+						
+						//Vised
+						content = content.replace("$viseCard", "Карта подписана вами. <br> Комментарий:" + card.getComment(commander));
+					} else {
+						
+						//Not vised
+						File contentFormFile = new File(PATH_TO_CO_CONTENT_PREVIEW_TEMPLATE_FORM);
+						String contentForm = FileUtils.readFileToString(contentFormFile, "windows-1251");
+						content = content.replace("$viseCard", contentForm);
+					}
+					//content = content.replace("$whatToSecondaryControll", card.getTask());
+					commanderString = commanderString.replace("$content", content);
+				}
 			} else {
 				try{
 					cardsToControllList = cardsToControllList + "<li><a href = \"?controllFocus=" + db.getCard(tag).getId() + "\">" + db.getCard(tag).getTask().substring(0, 20) + "...</a></li>";
@@ -286,35 +488,49 @@ public class CommanderManager extends HttpServlet{
 			System.out.println("Card in try: " + (String)session.getAttribute("cardFocus"));
 			Card cardF = db.getCard((String)session.getAttribute("cardFocus"));
 			String secondaryPushedTag = "";
-			for (Commander candidate : cardF.getSecondaryControllers().keySet()){
-				secondaryPushedTag = String.valueOf(candidate.getId()) + salt;
-				int hash = secondaryPushedTag.hashCode();
-				System.out.println("hash: " + hash);
-				System.out.println("reqHash: " + request.getParameter("pushTo" + String.valueOf(hash)));
-				boolean isPushedToChief = false;
-				boolean isPushedToSecondary = false;
-				try{
-					isPushedToChief = !request.getParameter("chiefPush").equals("")||!request.getParameter("chiefPush").equals(null)||!request.getParameter("chiefPush").equals(" ");
-					System.out.println("its chef!");
-				} catch (NullPointerException npe){
-					System.out.println("not a chef");
-				}
-				try{
-					isPushedToSecondary = !request.getParameter("pushTo" + String.valueOf(hash)).equals("")||!request.getParameter("pushTo" + String.valueOf(hash)).equals(" ")||!request.getParameter("pushTo" + String.valueOf(hash)).equals(null);
-					System.out.println("its him! " + candidate.getId());
-				} catch (NullPointerException npe){
-					System.out.println("not a " + candidate.getId());
-				}
-				if (isPushedToChief){
-						cardF.push(cardF.getChiefController());
-						db.addCard(cardF);
-						commanderString = commanderString.replace("$content", "Карта подана на рассмотрение главному контролирующему");
-						break;
-					} else if (isPushedToSecondary){
-						cardF.push(candidate);
-						db.addCard(cardF);
-						commanderString = commanderString.replace("$content", "Карта подана на рассмотрение контролирующему");
-						break;
+			boolean isPushedToChief = false;
+			try{
+				isPushedToChief = !request.getParameter("chiefPush").equals("")||!request.getParameter("chiefPush").equals(null)||!request.getParameter("chiefPush").equals(" ");
+				System.out.println("its chef!");
+			} catch (NullPointerException npe){
+				System.out.println("not a chef");
+			}
+
+			if (isPushedToChief){
+				cardF.push(cardF.getChiefController());
+				db.addCard(cardF);
+				commanderString = commanderString.replace("$content", "Карта подана на рассмотрение главному контролирующему");
+			} else {
+				for (Commander candidate : cardF.getSecondaryControllers().keySet()){
+					secondaryPushedTag = String.valueOf(candidate.getId()) + salt;
+					int hash = secondaryPushedTag.hashCode();
+					System.out.println("hash: " + hash);
+					System.out.println("reqHash: " + request.getParameter("pushTo" + String.valueOf(hash)));
+					//boolean isPushedToChief = false;
+					boolean isPushedToSecondary = false;
+					/*try{
+						isPushedToChief = !request.getParameter("chiefPush").equals("")||!request.getParameter("chiefPush").equals(null)||!request.getParameter("chiefPush").equals(" ");
+						System.out.println("its chef!");
+					} catch (NullPointerException npe){
+						System.out.println("not a chef");
+					}*/
+					try{
+						isPushedToSecondary = !request.getParameter("pushTo" + String.valueOf(hash)).equals("")||!request.getParameter("pushTo" + String.valueOf(hash)).equals(" ")||!request.getParameter("pushTo" + String.valueOf(hash)).equals(null);
+						System.out.println("its him! " + candidate.getId());
+					} catch (NullPointerException npe){
+						System.out.println("not a " + candidate.getId());
+					}
+					/*if (isPushedToChief){
+							cardF.push(cardF.getChiefController());
+							db.addCard(cardF);
+							commanderString = commanderString.replace("$content", "Карта подана на рассмотрение главному контролирующему");
+							break;
+						} else*/ if (isPushedToSecondary){
+							cardF.push(candidate);
+							db.addCard(cardF);
+							commanderString = commanderString.replace("$content", "Карта подана на рассмотрение контролирующему");
+							break;
+					}
 				}
 			}
 			commanderString = commanderString.replace("$content", "Здесь будут отображаться ваши карты");

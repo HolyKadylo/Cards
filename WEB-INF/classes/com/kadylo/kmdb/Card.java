@@ -313,6 +313,10 @@ public class Card extends MasterCard{
 		return directive;
 	};
 
+	void setDirective(Date directive){
+		this.directive = directive;
+	};
+
 	Date getClosed(){
 		return closed;
 	};
