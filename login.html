@@ -41,11 +41,11 @@
 		</script>
 		<h2>Введите идентификационные данные</h2><br>
 		<form action="auth" method=POST style = "text-align:center">
-			<input type="text" size="25" name="login" placeholder = "ФИО или табельный номер">
+			<input type="text" size="25" name="login" placeholder = "ФИО или табельный номер" required="true">
 			<abbr title="Если у вас нет пароля, вводите ФИО. Если у вас есть пароль, вводите табельный номер" style = "border-bottom:2px dotted blue; color:grey">
 				[?]</abbr>
 			<br>
-			<input type="password" size="25" name="pass" placeholder = "Пароль или табельный номер">
+			<input type="password" size="25" name="pass" placeholder = "Пароль или табельный номер" required="true">
 			<abbr title="Если вы ввели ФИО, вводите табельный номер. Если вы ввели табельный номер, вводите пароль" style = "border-bottom:2px dotted blue; color:grey">
 				[?]</abbr>
 			<br>

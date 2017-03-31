@@ -6,6 +6,41 @@
 	</title>
 </head>
 <body>
+	<!--ТУДУ мейк іт скріпт window.location.href = "/cards/login.html"-->
+	<script>
+		var url = window.location.href
+		var dataNotEnwritten = "msg=ntwerttn"
+		var executorAdded = "&msg=exadd"
+		var contrAdded = "&msg=coadd"
+		var wrongPass= "&msg=wrnps"
+		var unknownErr= "&msg=unk"
+	 	var cardSigned= "&msg=crdsgn"
+		var dateChanged= "&msg=date"
+		
+		if (url.includes(dataNotEnwritten)){
+			alert("Данные не были записаны")
+		}	
+		if (url.includes(executorAdded)){
+			alert("Исполнитель успешно добавлен")
+		}
+		if (url.includes(contrAdded)){
+			alert("Контролирующий успешно добавлен")
+		}	
+		if (url.includes(wrongPass)){
+			alert("Неверный пароль!")
+		}
+		if (url.includes(unknownErr)){
+			alert("Неизвестная ошибка")
+		}
+		if (url.includes(cardSigned)){
+			alert("Карта успешно подписана")
+		}	
+		if (url.includes(dateChanged)){
+			alert("Дата успешно установлена")
+		}	
+		
+	</script>
+
 	<span id="allcards" style="float:left;width:30%;height:100%;">
 		<h2>Всего карт к исполнению: $numCardsToExecute</h2><br>
 		<list>
@@ -15,6 +50,10 @@
 		<a href="/cards/addcard">[Добавить карту]</a>
 		<list>
 			$listOfCardsToControll
+		</list>
+		<h2>Всего архивированных карт: $numArchivedCards</h2><br>
+		<list>
+			$listOfArchivedCards
 		</list>
 	</span>
 

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Мои карты
+	</title>
+</head>
+<body>
+	<span id="allcards" style="float:left;width:30%;height:100%;">
+		<h2>Сейчас редактируется состав контролирующих карты $editingCardNum</h2><br>
+		$editingCardTask<hr>
+	</span>
+
+	<span id="head">Здравствуйте, <b>$username</b>
+		<a href="/cards/logout">[Выйти]</a><br><br>
+	</span><br>
+
+	<h3>Вы можете назначить следующих контролирующих: 
+	<abbr title="Здесь отображаются ваши подчиненные, еще не занятые в этой карте. Распишите задания кому считаете нужным и нажмите Готово" style = "border-bottom:2px dotted blue; color:grey">[?]</abbr></h3><br>
+	<span id="details" style="float:right;width:70%;height:100%;">
+	<form action="addcontroller?focus=$submitFocus" method="POST">
+		<list>
+		$coExecutorsList
+		</list>
+		<br>
+		<input type="submit" value="Готово"></input>
+		<button type="button" onclick="window.location.href = '/cards/dashboard'">Отмена</button>
+	</form>
+	</span>
+	
+</body>
+</html>
