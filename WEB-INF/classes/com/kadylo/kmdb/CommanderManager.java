@@ -156,33 +156,31 @@ public class CommanderManager extends HttpServlet{
 		Commander commander = db.getCommander((Integer)session.getAttribute("tabelNumber"));
 		Soldier soldier = db.getSoldier((Integer)session.getAttribute("tabelNumber"));
 		commanderString = commanderString.replace("$username", commander.getFirstName());
-
+		
 		//here we have to find, how much cards were closed for executor
-		int exClosedCards = 0;
-		for (String cardToExecuteTag : soldier.getCardsToExecute()){
-			Card cardToExecute = db.getCard(cardToExecuteTag);
-			if (cardToExecute.getClosedSign().doesExist()){
-		
-				//means that it is closed
-				exClosedCards ++;		
-			}
-		}
-
+ 		int exClosedCards = 0;
+ 		for (String cardToExecuteTag : soldier.getCardsToExecute()){
+ 			Card cardToExecute = db.getCard(cardToExecuteTag);
+ 			if (cardToExecute.getClosedSign().doesExist()){
+ 		
+ 				//means that it is closed
+ 				exClosedCards ++;		
+ 			}
+ 		} 
 		commanderString = commanderString.replace("$numCardsToExecute", String.valueOf(soldier.getCardsToExecute().size() - exClosedCards));
-
-		//here we have to find, how much cards were closed for commander
-		int closedCards = 0;
-		for (String cardToControllTag : commander.getCardsToControll()){
-			Card cardToControll = db.getCard(cardToControllTag);
-			if (cardToControll.getClosedSign().doesExist()){
 		
-				//means that it is closed
-				closedCards ++;		
-			}
-		}
+		//here we have to find, how much cards were closed for commander
+ 		int closedCards = 0;
+ 		for (String cardToControllTag : commander.getCardsToControll()){
+ 			Card cardToControll = db.getCard(cardToControllTag);
+ 			if (cardToControll.getClosedSign().doesExist()){
+ 		
+ 				//means that it is closed
+ 				closedCards ++;		
+ 			}
+ 		}
 		
 		commanderString = commanderString.replace("$numCardsToControll", String.valueOf(commander.getCardsToControll().size() - closedCards));
-		commanderString = commanderString.replace("$numArchivedCards", String.valueOf(closedCards + exClosedCards));
 		
 		// forming cards to execute
 		String cardsToExecuteList = "";
@@ -514,201 +512,6 @@ public class CommanderManager extends HttpServlet{
 			};
 		}
 		commanderString = commanderString.replace("$listOfCardsToControll", cardsToControllList);
-
-		// forming archived cards
-		String archivedCardsList = "";
-		for (String tag : commander.getCardsToControll()){
-			Card card = db.getCard(tag);
-
-			// skipping unsigned cards
-			if (!card.getClosedSign().doesExist())
-				continue;
-			if (controllFocus.equals(db.getCard(tag).getId())){
-				// this commander will be deleted;
-		String deleteCo;
-		{deleteCo = request.getParameter("deleteCo");}
-		try{
-			if (deleteCo != null){
-				card.removeController(db.getCommander(Integer.parseInt(deleteCo)));
-
-				// putting card back
-				try{
-					db.addCard(card);
-				} catch (SQLException e){
-					//TODO alert
-				}
-			}
-		} catch (NoSuchElementException nsee) {
-
-			//nothing 
-		}
-
-		try{
-			cardsToControllList = cardsToControllList + "<li><b><a href = \"?controllFocus=" + card.getId() + "\">" + card.getTask().substring(0, 20) + "...</a></b></li>";
-		} catch (StringIndexOutOfBoundsException sioobe){
-			cardsToControllList = cardsToControllList + "<li><b><a href = \"?controllFocus=" + card.getId() + "\">" + card.getTask() + "</a></b></li>";
-		}
-
-		// printing selected card
-		// here we are using different templates 
-		// depending on whether user is chief or not
-		if (card.isChief(commander)){
-					
-			// is chief
-			if (!card.getClosedSign().doesExist()){
-				
-				// means that card is open
-				File contentFile = new File(PATH_TO_CH_CO_CONTENT_PREVIEW_TEMPLATE);
-				String content = FileUtils.readFileToString(contentFile, "windows-1251");
-				content = content.replace("$cardCode", card.getId());
-				try{
-					content = content.replace("$cardName", card.getTask().substring(0, 20) + "...");
-				} catch (StringIndexOutOfBoundsException sioobe){
-					content = content.replace("$cardName", card.getTask());
-				}
-				content = content.replace("$directiveDate", dateFormat.format(card.getDirective()));
-				Date now = new Date();
-				content = content.replace("$cardFocus", card.getId());	
-				content = content.replace("$executor", card.getPrimaryExecutor().getLastName());
-				content = content.replace("$exDept", String.valueOf(card.getPrimaryExecutor().getDepartment()));
-				content = content.replace("$daysRemain", String.valueOf(1 + java.lang.Math.round((card.getDirective().getTime() - now.getTime())/1000/60/60/24)));
-				content = content.replace("$docCode", card.getDocument().getNumber() + "/" + card.getDocument().getDepartment());
-				content = content.replace("$docTag", card.getDocument().getTitle());
-				content = content.replace("$docStar", card.getDocument().getStar().getLastName());
-				content = content.replace("$dStarDepartment", String.valueOf(card.getDocument().getStar().getDepartment()));
-				content = content.replace("$cardTask", card.getTask());
-
-				// forming $listOfSecondaryControllers
-				String listOfSecondaryControllers = "";
-
-				// this executor will be modified;
-				String changeCo;
-				Commander commanderToModify = null;
-				{
-					changeCo = request.getParameter("changeCo");
-				}
-				try{
-					if (changeCo != null){
-						commanderToModify = db.getCommander(Integer.parseInt(changeCo));
-					}
-				} catch (NoSuchElementException nsee) {
-
-					//nothing 
-				}
-
-				boolean wasModified = false;
-				try{
-					wasModified = request.getAttribute("modified").equals("ok");
-				} catch (NullPointerException npe){
-					wasModified = false;
-					request.setAttribute("modified", "notok");
-				}
-				
-				for(Commander secondController : card.getSecondaryControllers().keySet()){
-					if (!secondController.equals(commanderToModify) || wasModified ){
-						for(Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
-							listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": " + card.getSecondaryControllers().get(secondController).get(sign) + "<br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><a href=\"?controllFocus=" + card.getId() + "&changeCo=" + String.valueOf(secondController.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
-							break;
-						}
-						request.setAttribute("modified", "notok");
-					} else {
-						for (Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
-							listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newCoTask\" placeholder=\"" + card.getSecondaryControllers().get(secondController).get(sign) + "\"><br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
-						}
-					}
-				}
-				// content = content.replace("$thisCard", card.getId());
-				content = content.replace("$listOfSecondaryControllers", listOfSecondaryControllers);
-				commanderString = commanderString.replace("$content", content);
-			} else {
-						
-				//means that card is closed
-				File contentFile = new File(PATH_TO_CH_CO_CONTENT_PREVIEW_TEMPLATE_SIGNED);
-				String content = FileUtils.readFileToString(contentFile, "windows-1251");
-				content = content.replace("$cardCode", card.getId());
-				try{
-					content = content.replace("$cardName", card.getTask().substring(0, 20) + "...");
-				} catch (StringIndexOutOfBoundsException sioobe){
-					content = content.replace("$cardName", card.getTask());
-				}
-				content = content.replace("$directiveDate", dateFormat.format(card.getDirective()));
-				Date now = new Date();
-				content = content.replace("$executor", card.getPrimaryExecutor().getLastName());
-				content = content.replace("$exDept", String.valueOf(card.getPrimaryExecutor().getDepartment()));
-				content = content.replace("$signDate",  dateFormat.format(card.getClosedSign().getApplied()));
-				content = content.replace("$docCode", card.getDocument().getNumber() + "/" + card.getDocument().getDepartment());
-				content = content.replace("$docTag", card.getDocument().getTitle());
-				content = content.replace("$docStar", card.getDocument().getStar().getLastName());
-				content = content.replace("$dStarDepartment", String.valueOf(card.getDocument().getStar().getDepartment()));
-				content = content.replace("$cardTask", card.getTask());
-	
-				// since we don't need it
-				content = content.replace("$listOfSecondaryControllers", " ");
-				commanderString = commanderString.replace("$content", content);
-			}
-		} else {
-					
-			// is not a chief
-			File contentFile = new File(PATH_TO_CO_CONTENT_PREVIEW_TEMPLATE);
-			String content = FileUtils.readFileToString(contentFile, "windows-1251");
-			content = content.replace("$chiefController", card.getChiefController().getLastName());
-			content = content.replace("$directiveDate", dateFormat.format(card.getDirective()));
-			content = content.replace("$cardCode", card.getId());
-			Date now = new Date();
-			content = content.replace("$daysRemain", String.valueOf(1 + java.lang.Math.round((card.getDirective().getTime() - now.getTime())/1000/60/60/24)));
-			content = content.replace("$executor", card.getPrimaryExecutor().getLastName());
-			content = content.replace("$exDept", String.valueOf(card.getPrimaryExecutor().getDepartment()));
-			content = content.replace("$docCode", card.getDocument().getNumber() + "/" + card.getDocument().getDepartment());
-			content = content.replace("$docTag", card.getDocument().getTitle());
-			content = content.replace("$docStar", card.getDocument().getStar().getLastName());
-			content = content.replace("$dStarDepartment", String.valueOf(card.getDocument().getStar().getDepartment()));
-			content = content.replace("$cardTask", card.getTask());
-			try{
-				content = content.replace("$cardName", card.getTask().substring(0, 20) + "...");
-			} catch (StringIndexOutOfBoundsException sioobe){
-				content = content.replace("$cardName", card.getTask());
-			}
-					
-			for (Signature sign : card.getSecondaryControllers().get(commander).keySet()){
-				content = content.replace("$whatToSecondaryControll", card.getSecondaryControllers().get(commander).get(sign));
-				break;
-			}
-			if (card.getVised(commander)){
-						
-				//Vised
-				content = content.replace("$viseCard", "Карта подписана вами. <br> Комментарий:" + card.getComment(commander));
-			} else {
-				
-				//Not vised
-				File contentFormFile = new File(PATH_TO_CO_CONTENT_PREVIEW_TEMPLATE_FORM);
-				String contentForm = FileUtils.readFileToString(contentFormFile, "windows-1251");
-				content = content.replace("$viseCard", contentForm);
-			}
-			//content = content.replace("$whatToSecondaryControll", card.getTask());
-			commanderString = commanderString.replace("$content", content);
-			
-		}
-			} else {
-				try{
-					archivedCardsList = archivedCardsList + "<li><a href = \"?controllFocus=" + db.getCard(tag).getId() + "\">" + db.getCard(tag).getTask().substring(0, 20) + "...</a></li>";
-				} catch (StringIndexOutOfBoundsException sioobe){
-					archivedCardsList = archivedCardsList + "<li><a href = \"?controllFocus=" + db.getCard(tag).getId() + "\">" + db.getCard(tag).getTask() + "</a></li>";
-				}
-			}
-		}
-		for (String tag : soldier.getCardsToExecute()){
-			Card card = db.getCard(tag);
-			
-			// skipping signed card
-			if (!card.getClosedSign().doesExist())
-				continue;
-			try{
-				archivedCardsList = archivedCardsList + "<li><a href = \"?executionFocus=" + db.getCard(tag).getId() + "\">" + db.getCard(tag).getTask().substring(0, 20) + "...</a></li>";
-			} catch (StringIndexOutOfBoundsException sioobe){
-				archivedCardsList = archivedCardsList + "<li><a href = \"?executionFocus=" + db.getCard(tag).getId() + "\">" + db.getCard(tag).getTask() + "</a></li>";
-			}
-		}
-		commanderString = commanderString.replace("$listOfArchivedCards", archivedCardsList );
 
 /**********************************************************************************************************************************************************************************/
 		// if $content was not modified, replacing with short values
