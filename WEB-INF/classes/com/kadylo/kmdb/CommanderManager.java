@@ -304,7 +304,7 @@ public class CommanderManager extends HttpServlet{
 							continue;
 						}
 						String encodedCommanderTag = String.valueOf(comd.getId()) + salt;
-						secondaryControllersString = secondaryControllersString + "<input type=\"submit\" method=\"GET\" name=\"pushTo" + encodedCommanderTag.hashCode() + "\" value=\"Подать на рассмотрение\"></input>" + comd.getLastName() + ":<br> " + card.getSecondaryControllers().get(comd).get(signature) + "<br><br>";
+						secondaryControllersString = secondaryControllersString + comd.getLastName() + ": " + card.getSecondaryControllers().get(comd).get(signature) + "<br><br>";
 					}
 				}
 				commanderString = commanderString.replace("$secondaryControllers", secondaryControllersString);
