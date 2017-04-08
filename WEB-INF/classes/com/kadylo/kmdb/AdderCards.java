@@ -85,9 +85,8 @@ public class AdderCards extends HttpServlet{
 		
 		//very bad
 		String chiefControllers = "";
-		for (int i = 1; i < 10000; i ++){
+		for (Commander can : db.getCommanders(CHIEFS_DEPARTMENT)){
 			try{
-				Commander can = db.getCommanders(CHIEFS_DEPARTMENT);
 				if (can.getDepartment() == 999)
 					chiefControllers = chiefControllers + "<option value = \"" + String.valueOf(String.valueOf(can.getId()).hashCode()) + "\">" + can.getLastName() + "</option>";
 			} catch (NoSuchElementException nsee){
