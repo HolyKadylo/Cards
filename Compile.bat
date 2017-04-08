@@ -26,6 +26,7 @@ javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF
 javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/ChiefSign.java
 javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/AdderControllers.java
 javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/AnotherDateSetter.java
+javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF/classes/com/kadylo/kmdb/AdderCards.java
 ECHO 
 pause
 echo on

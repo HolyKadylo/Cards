@@ -134,6 +134,15 @@
       <load-on-startup>5</load-on-startup>
     </servlet>
 
+    <servlet>
+      <servlet-name>addCard</servlet-name>
+      <description>
+        This servlet adds cards to the database
+      </description>
+      <servlet-class>com.kadylo.kmdb.AdderCards</servlet-class>
+      <load-on-startup>5</load-on-startup>
+    </servlet>
+
     <servlet-mapping>
       <servlet-name>authorization</servlet-name>
       <url-pattern>/auth</url-pattern>
@@ -178,9 +187,12 @@
       <servlet-name>chiefSign</servlet-name>
       <url-pattern>/chiefSign</url-pattern>
     </servlet-mapping>
-	
-	
 
+    <servlet-mapping>
+      <servlet-name>addCard</servlet-name>
+      <url-pattern>/addcard</url-pattern>
+    </servlet-mapping>
+	
    <!--  <servlet-mapping>
       <servlet-name>addCard</servlet-name>
       <url-pattern>/addcard</url-pattern>

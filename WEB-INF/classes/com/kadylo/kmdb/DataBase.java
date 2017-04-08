@@ -386,6 +386,87 @@ public class DataBase{
 		return sold;
 	}
 
+	// returns commanders of the specified department
+	ArrayList<Document> getCommanders(int dept) throws NoSuchElementException{
+		Commander com = new Commander ();
+		try (Connection connection = Pool.getConnection())
+		{ 
+			com.setId(id);
+			String firstName = new String();
+			String lastName = new String();
+			String password= new String();
+			int department = 0;
+			String sentense = "SELECT firstName, lastName, password, department FROM Employees WHERE department = ?";
+			PreparedStatement statement = connection.prepareStatement(sentense);
+			statement.setInt(1, dept);
+			ResultSet rs = statement.executeQuery();
+			while (rs.next()){***
+			firstName = rs.getString("firstName");
+			lastName= rs.getString("lastName");	
+			password = rs.getString("password");	
+			department = rs.getInt("department");			
+			com.setFirstName(firstName);
+			com.setLastName(lastName);
+			com.setPassword(password);
+			com.setDepartment(department);
+					
+			// making cards to controll & may sign
+			TreeSet<String> cardsToControll =  new TreeSet<String>();
+			TreeSet<String> maySign =  new TreeSet<String>();
+			sentense = "SELECT id, chiefController FROM Cards WHERE (chiefController = ? OR secondaryControlers IN (SELECT bunchOfControllers FROM secondaryControllers WHERE ids = ?)) AND archived = FALSE";
+			statement = connection.prepareStatement(sentense);
+			statement.setInt(1, id);
+			statement.setInt(2, id);
+			rs = statement.executeQuery();
+			while (rs.next()){
+				cardsToControll.add(rs.getString("id"));
+				if (rs.getInt("chiefController") == id){
+					maySign.add(rs.getString("id"));
+				}			
+			}
+			com.setCardsToControll(cardsToControll);
+
+			// making directSlaves
+			TreeSet<Integer> directSlaves =  new TreeSet<Integer>();
+			sentense = "SELECT slaves FROM Departments WHERE master = ?";
+			statement = connection.prepareStatement(sentense);
+			statement.setInt(1, id);
+			rs = statement.executeQuery();
+			while (rs.next()){
+				directSlaves.add(rs.getInt("slaves"));		
+			}
+			com.setDirectSlaves(directSlaves);
+
+			// making producedDocuments
+			TreeSet<Integer> producedDocuments = new TreeSet<Integer>();
+			sentense = "SELECT number FROM Documents WHERE producer = ?";
+			statement = connection.prepareStatement(sentense);
+			statement.setInt(1, id);
+			rs = statement.executeQuery();	
+			while (rs.next()){
+				producedDocuments.add(rs.getInt("number"));			
+			}
+			com.setProducedDocuments(producedDocuments);
+
+			// making starredDocuments
+			TreeSet<Integer> starredDocuments = new TreeSet<Integer>();
+			sentense = "SELECT number FROM Documents WHERE star = ?";
+			statement = connection.prepareStatement(sentense);
+			statement.setInt(1, id);
+			rs = statement.executeQuery();	
+			while (rs.next()){
+				starredDocuments.add(rs.getInt("number"));			
+			}
+			com.setStarredDocuments(starredDocuments);
+		} catch (SQLException e){
+			if (e.toString().contains("ResultSet is empty"))
+				throw new NoSuchElementException("Failed to get commander from DB because provided id was not found");
+			System.out.println("DB issue: " + e.toString());	
+			System.exit(0);
+		}
+		return com;
+	}
+
 	Commander getCommander(int id) throws NoSuchElementException{
 		Commander com = new Commander ();
 		try (Connection connection = Pool.getConnection())

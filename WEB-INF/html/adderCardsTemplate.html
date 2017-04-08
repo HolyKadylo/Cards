@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Мои карты
+	</title>
+</head>
+<body>
+	<span id="allcards" style="float:left;width:30%;height:100%;">
+		<h2>Сейчас добавляется новая карта <br>#$cardCode</h2><br>
+		 <hr>
+	</span>
+
+	<span id="head">Здравствуйте, <b>$username</b>
+		<a href="/cards/logout">[Выйти]</a><br><br>
+	</span><br>
+
+	<span id="details" style="float:right;width:70%;height:100%;">
+	<form action="/cards/addcard" method="POST">
+		<b>Выберите контролирующего: </b><br>
+		<select name="chiefController" required = "true">
+			<!--<option value = "...">...</option>-->
+			$chiefControllers
+		</select> 
+		<br>
+		Введите содержание пункта для контроля:<br> <input name = "wtc" type="text" size="45" required="true"></input><br>
+		Укажите директивный срок исполнения:<br> <input type = "date" required = "true"></input><br>
+		Загрузите распорядительный документ:<br>
+		<input type="url" disabled="true"></input><input type="button" disabled = "true" value="Обзор"></input>
+		<abbr title="Опция пока недоступна" style = "border-bottom:2px dotted blue; color:grey">[?]</abbr><br>
+		Укажите метаданные документа: <br>
+		<input type = "number" placeholder = "Номер" required = "true"></input> <input type = "number" placeholder= "Табельный номер исполнителя" required = "true"><br>
+		</input><input type = "text" size = "45" placeholder = "Название" required = "true"></input><br>
+		<b>Выберите исполнителя: </b><br>
+		<select name="primaryExecutor" required = "true">
+			<!--<option value = "...">...</option>-->
+			$primaryExecutors
+		</select> 
+		<br><br>
+		<input type="submit" value="Готово"></input>
+		<button type="button" onclick="window.location.href = '/cards/dashboard'">Отмена</button>
+	</form>
+	</span>
+	
+</body>
+</html>
