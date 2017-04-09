@@ -76,6 +76,7 @@ public class Card extends MasterCard{
 		secondaryExecutors = new HashMap  <Soldier, String>();
 		secondaryControllers = new HashMap <Commander, HashMap<Signature, String>>();
 		pushed = new HashMap <Commander, Boolean>();
+		pushed.put(chiefController, false);
 
 		/*Except for this one, we need it 'cause there is nowhere else to change it*/
 		//pushed
@@ -569,6 +570,7 @@ public class Card extends MasterCard{
 			("Commander was not found while figuring out was said near comment");
 	}
 	
+	// returns false 
 	boolean getPushed(Commander commander) throws 
 		IllegalArgumentException{
 		if (commander == null)
@@ -580,7 +582,15 @@ public class Card extends MasterCard{
 			throw new IllegalArgumentException(
 				"Trying to get pushed of non affected commander"
 			);
-		return pushed.get(commander);
+		
+		boolean res = false;
+		try{
+			res = pushed.get(commander);
+		} catch (NullPointerException npe){
+			return false;
+		}
+		
+		return res;
 	}
 
 	//Test

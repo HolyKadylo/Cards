@@ -11,13 +11,16 @@ import org.apache.commons.io.FileUtils;
 import java.util.NoSuchElementException;
 import java.text.SimpleDateFormat;
 import java.sql.SQLException;
+import java.text.ParseException;
 
 public class AdderCards extends HttpServlet{
 	private static final int CHIEFS_DEPARTMENT = 999;
 	private static final long serialVersionUID = 19L;
 	private static final String PATH = DataBase.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 	private static final String PATH_TO_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/adderCardsTemplate.html";
-	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
+	
+	// this is date format used in google chrome date picker
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 	
 	// contains single line of salt that is added to the "ids"
 	private static final String PATH_TO_SALT = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "classes/resources/salt.txt";
@@ -29,8 +32,37 @@ public class AdderCards extends HttpServlet{
 		DataBase db = DataBase.access();
 		Commander commander = db.getCommander((Integer)session.getAttribute("tabelNumber"));
 		Soldier soldier = db.getSoldier((Integer)session.getAttribute("tabelNumber"));
-		String cardTag = request.getParameter("focus");
-		Card card = db.getCard(cardTag);
+		String cardTag = request.getParameter("cc");
+		int chiefHash = Integer.parseInt(request.getParameter("chiefController"));
+		int exHash = Integer.parseInt(request.getParameter("primaryExecutor"));
+		int chiefTag = 0;
+		int solTag = 0;
+		File saltFile = new File(PATH_TO_SALT);
+		String salt = FileUtils.readFileToString(saltFile, "windows-1251");
+		for (Commander can : db.getCommanders(CHIEFS_DEPARTMENT)){
+			if (chiefHash == String.valueOf(can.getId() + salt).hashCode()){
+				chiefTag = can.getId();
+				break;
+			}
+		}
+		
+		for (Soldier sol : db.getSoldiers()){
+			if (exHash == String.valueOf(sol.getId() + salt).hashCode()){
+				solTag = sol.getId();
+				break;
+			}
+		}
+		Date dir = null;
+		try{
+			dir = dateFormat.parse(request.getParameter("dir"));
+			//card.setDirective(date);
+		} catch (ParseException pe){
+			PrintWriter out = response.getWriter();
+			//out.println("<!DOCTYPE html><html><head><script>alert(\"Данные не были записаны!\")</script></head><body></body></html>");
+			System.out.println("here 1");
+			response.sendRedirect("/cards/dashboard?msg=ntwerttn");
+			return;
+		}
 		
 		// bouncing back unauthorized session
 		try{
@@ -41,20 +73,59 @@ public class AdderCards extends HttpServlet{
 			response.sendRedirect("login.html?msg=una");
 			return;
 		}
+		
+		// date = new Date() because we have failed to store this data in DB
+		// TODO fix
+		int docNum = Integer.parseInt(request.getParameter("number"));
+		int tabelNumEx = Integer.parseInt(request.getParameter("tabelNumEx"));
+		String docName = request.getParameter("docName");
+		Soldier sol = null;
+		try {
+			sol = db.getSoldier(tabelNumEx);
+		} catch (NoSuchElementException nsee){
+			PrintWriter out = response.getWriter();
+			//out.println("<!DOCTYPE html><html><head><script>alert(\"Данные не были записаны!\")</script></head><body></body></html>");
+			System.out.println("here 2");
+			response.sendRedirect("/cards/dashboard?msg=wrnsol");
+			return;
+		}
+		Commander comm = null;
+		for (Soldier comSol : db.getSoldiers()){
+			if (sol.getDepartment() == comSol.getDepartment()){
+				comm = db.getCommander(comSol.getId());
+				break;
+			}
+		}
+		
+		Document doc = new Document (sol.getDepartment(), docNum, new Date(), comm, sol, docName);
+		Card card = new Card(cardTag, db.getCommander(chiefTag), new Date(), dir, new Date(0), request.getParameter("wtc"), db.getSoldier(solTag), doc);
 
-
-
-
-
+		try{
+			ArrayList<Document> docum = db.getDocument(docNum);
+		} catch (NoSuchElementException nsee){
+			
+			//means that there is no such document
+			try{
+				db.addDocument(doc);
+			} catch (SQLException sqle){
+				PrintWriter out = response.getWriter();
+				//out.println("<!DOCTYPE html><html><head><script>alert(\"Данные не были записаны!\")</script></head><body></body></html>");
+				System.out.println("here 3");
+				response.sendRedirect("/cards/dashboard?msg=ntwerttn");
+				return;
+			}
+		}
+		
 		try{
 			db.addCard(card);
 		} catch (SQLException e){
 			PrintWriter out = response.getWriter();
 			//out.println("<!DOCTYPE html><html><head><script>alert(\"Данные не были записаны!\")</script></head><body></body></html>");
-			response.sendRedirect("/dashboard?executionFocus=" + cardTag + "&msg=ntwerttn");
+			System.out.println("here 4");
+			response.sendRedirect("/cards/dashboard?msg=ntwerttn");
 			return;
 		}
-		response.sendRedirect("/cards/dashboard?executionFocus=" + cardTag + "&msg=coadd");
+		response.sendRedirect("/cards/dashboard?msg=crdadd");
 	}
 
 	@Override

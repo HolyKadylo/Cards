@@ -16,6 +16,8 @@
 		var unknownErr= "&msg=unk"
 	 	var cardSigned= "&msg=crdsgn"
 		var dateChanged= "&msg=date"
+		var cardAdded= "&msg=crdadd"
+		var wrongSoldier= "&msg=wrnsol"
 		
 		if (url.includes(dataNotEnwritten)){
 			alert("Данные не были записаны")
@@ -38,7 +40,12 @@
 		if (url.includes(dateChanged)){
 			alert("Дата успешно установлена")
 		}	
-		
+		if (url.includes(cardAdded)){
+			alert("Карта успешно добавлена")
+		}	
+		if (url.includes(wrongSoldier)){
+			alert("Неверно указан исполнитель документа")
+		}	
 	</script>
 
 	<span id="allcards" style="float:left;width:30%;height:100%;">

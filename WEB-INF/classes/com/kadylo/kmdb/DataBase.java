@@ -55,6 +55,40 @@ public class DataBase{
 	}
 
 	/* Setters */
+	public void addDocument(Document document) throws SQLException{
+		
+		//(id, chiefController, created, directive, closed, task, primaryExecutor, document, secondaryControlers, secondaryExecutors, archived, isPushedToChief)
+		String sentense = "INSERT INTO Documents (number, department, created, title, producer, star) VALUES (?, ?, ?, ?, ?, ?)";
+		
+		// we have to use this form instead of try-with-resourses in order to allow rollback
+		Connection connection = Pool.getConnection();
+		try{
+			connection.setAutoCommit(false);			
+			PreparedStatement statement = connection.prepareStatement(sentense);
+			statement.setInt(1, document.getNumber());
+			statement.setInt(2, document.getDepartment());
+			statement.setDate(3, new java.sql.Date(document.getDate().getTime()));
+			statement.setString(4, document.getTitle());
+			statement.setInt(5, document.getProducer().getId());
+			statement.setInt(6, document.getStar().getId());
+			statement.executeUpdate();
+		
+			connection.commit();
+		} catch (SQLException e){
+			connection.rollback();
+			e.printStackTrace();
+			System.out.println("DB issue: " + e.toString());	
+			System.exit(0);
+		} finally{
+			connection.close();
+		}
+	}
+	
+	
+	
+	
+	
+	
 		
 	// this method adds specified card and overrides it if needed
 	public void addCard(Card card) throws SQLException{
@@ -402,9 +436,9 @@ public class DataBase{
 			// https://www.w3schools.com/sql/sql_distinct.asp
 			String sentense = "SELECT DISTINCT department FROM Employees";
 			Statement staticStatement = connection.createStatement();
-			System.out.println("Selecting distinct department");
+			//System.out.println("Selecting distinct department");
 			ResultSet rs = staticStatement.executeQuery(sentense);
-			System.out.println("Seleced distinct department");
+			//System.out.println("Seleced distinct department");
 			ArrayList<Integer> dpts = new ArrayList<Integer>();
 			while (rs.next()){
 				dpts.add(rs.getInt("department"));
@@ -414,9 +448,9 @@ public class DataBase{
 				sentense = "SELECT DISTINCT master FROM Departments WHERE department = ?";
 				PreparedStatement statement = connection.prepareStatement(sentense);
 				statement.setInt(1, dpt);
-				System.out.println("Selecting distinct master");
+				//System.out.println("Selecting distinct master");
 				ResultSet rs0 = statement.executeQuery();
-				System.out.println("Selected distinct department");
+				//System.out.println("Selected distinct department");
 				while (rs0.next()){
 					ids.add(rs0.getInt("master"));
 				}
@@ -426,9 +460,9 @@ public class DataBase{
 				sentense = "SELECT firstName, lastName FROM Employees WHERE id = ?";
 				PreparedStatement statement = connection.prepareStatement(sentense);
 				statement.setInt(1, iid);
-				System.out.println("Selecting data");
+				//System.out.println("Selecting data");
 				ResultSet rs9 = statement.executeQuery();
-				System.out.println("Selected data");
+				//System.out.println("Selected data");
 				while (rs9.next()){
 					Soldier sold = new Soldier();
 					firstName = rs9.getString("firstName");
