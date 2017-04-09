@@ -385,6 +385,118 @@ public class DataBase{
 		}
 		return sold;
 	}
+	
+	// returns soldiers that represent heads of departments
+	ArrayList<Soldier> getSoldiers() throws NoSuchElementException{
+		ArrayList<Soldier> solds = new ArrayList<Soldier>();
+		try (Connection connection = Pool.getConnection()){
+		
+			// now this was added to try-with-resources
+			// Connection connection = Pool.getConnection();
+			String firstName = new String();
+			String lastName = new String();
+			int department = 0;
+			int id = 0;
+			
+			// DISTINCT
+			// https://www.w3schools.com/sql/sql_distinct.asp
+			String sentense = "SELECT DISTINCT department FROM Employees";
+			Statement staticStatement = connection.createStatement();
+			System.out.println("Selecting distinct department");
+			ResultSet rs = staticStatement.executeQuery(sentense);
+			System.out.println("Seleced distinct department");
+			ArrayList<Integer> dpts = new ArrayList<Integer>();
+			while (rs.next()){
+				dpts.add(rs.getInt("department"));
+			}
+			ArrayList<Integer> ids = new ArrayList<Integer>();
+			for (Integer dpt : dpts){
+				sentense = "SELECT DISTINCT master FROM Departments WHERE department = ?";
+				PreparedStatement statement = connection.prepareStatement(sentense);
+				statement.setInt(1, dpt);
+				System.out.println("Selecting distinct master");
+				ResultSet rs0 = statement.executeQuery();
+				System.out.println("Selected distinct department");
+				while (rs0.next()){
+					ids.add(rs0.getInt("master"));
+				}
+			}
+			
+			for (Integer iid : ids){
+				sentense = "SELECT firstName, lastName FROM Employees WHERE id = ?";
+				PreparedStatement statement = connection.prepareStatement(sentense);
+				statement.setInt(1, iid);
+				System.out.println("Selecting data");
+				ResultSet rs9 = statement.executeQuery();
+				System.out.println("Selected data");
+				while (rs9.next()){
+					Soldier sold = new Soldier();
+					firstName = rs9.getString("firstName");
+					lastName= rs9.getString("lastName");	
+					sold.setFirstName(firstName);
+					sold.setLastName(lastName);
+					sold.setId(iid);	
+					
+					// adding missing department
+					sentense = "SELECT department FROM Employees WHERE id = ?";
+					statement = connection.prepareStatement(sentense);
+					statement.setInt(1, iid);
+					ResultSet rs1 = statement.executeQuery();
+					rs1.next();
+					department = rs1.getInt("department");
+					sold.setDepartment(department);
+					
+					// making cards to execute
+					TreeSet<String> cardsToExecute =  new TreeSet<String>();//***** рсдс опноеп декере
+					sentense = "SELECT id FROM Cards WHERE (primaryExecutor = ? OR secondaryExecutors IN (SELECT bunchOfExecutors FROM secondaryExecutors WHERE ids = ?)) AND archived = FALSE";
+					statement = connection.prepareStatement(sentense);
+					statement.setInt(1, iid);
+					statement.setInt(2, iid);
+					ResultSet rs2 = statement.executeQuery();
+					while(rs2.next()){
+						cardsToExecute.add(rs2.getString("id"));				
+					};
+					sold.setCardsToExecute(cardsToExecute);
+
+					// making directSlaves
+					TreeSet<Integer> directSlaves =  new TreeSet<Integer>();
+					sentense = "SELECT slaves FROM Departments WHERE master = ?";
+					statement = connection.prepareStatement(sentense);
+					statement.setInt(1, iid);
+					ResultSet rs3 = statement.executeQuery();
+					while(rs3.next()){
+						directSlaves.add(rs3.getInt("slaves"));		
+					};
+					sold.setDirectSlaves(directSlaves);
+
+					// making producedDocuments
+					// making starredDocuments
+					TreeSet<Integer> producedDocuments = new TreeSet<Integer>();
+					TreeSet<Integer> starredDocuments = new TreeSet<Integer>();
+					sentense = "SELECT number, producer, star FROM Documents WHERE producer = ? OR star = ?";
+					statement = connection.prepareStatement(sentense);
+					statement.setInt(1, iid);
+					statement.setInt(2, iid);
+					ResultSet rs4 = statement.executeQuery();	
+					while (rs4.next()){
+						if (rs4.getInt("producer") == iid)
+							producedDocuments.add(rs4.getInt("number"));	
+						if (rs4.getInt("star") == iid)
+							starredDocuments.add(rs4.getInt("number"));		
+					}
+					sold.setProducedDocuments(producedDocuments);
+					sold.setStarredDocuments(starredDocuments);		
+					solds.add(sold);
+				}
+			}
+		} catch (SQLException e){
+			if (e.toString().contains("ResultSet is empty"))
+				throw new NoSuchElementException("Failed to get soldier from DB because provided id was not found\nFailed to get heads of departments as soldiers");
+			System.out.println("DB issue: " + e.toString());	
+			System.exit(0);
+		}
+		return solds;
+	}
 
 	// returns commanders of the specified department
 	ArrayList<Commander> getCommanders(int dept) throws NoSuchElementException{

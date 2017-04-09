@@ -22,6 +22,8 @@
 *.rar
 
 # My resources
+*.xls
+*.xlsx
 *.accdb
 *.laccdb
 *.svg

@@ -19,6 +19,9 @@ public class AdderCards extends HttpServlet{
 	private static final String PATH_TO_TEMPLATE = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "html/adderCardsTemplate.html";
 	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("ddMMyyyy");
 	
+	// contains single line of salt that is added to the "ids"
+	private static final String PATH_TO_SALT = PATH.substring(0, PATH.indexOf("classes")).replace("%20", " ") + "classes/resources/salt.txt";
+	
 	@Override
 	public void doPost(HttpServletRequest request, HttpServletResponse response)throws IOException, ServletException {
 		System.out.println("Doing adder cards POST");
@@ -83,20 +86,27 @@ public class AdderCards extends HttpServlet{
 		adderCardsString = adderCardsString.replace("$username", commander.getFirstName());
 		adderCardsString = adderCardsString.replace("$cardCode", generateCode(commander));
 		
-		//very bad
+		// Forming chief controllers list
 		String chiefControllers = "";
+		
+		// adding salt
+		File saltFile = new File(PATH_TO_SALT);
+		String salt = FileUtils.readFileToString(saltFile, "windows-1251");
 		for (Commander can : db.getCommanders(CHIEFS_DEPARTMENT)){
-			try{
-				if (can.getDepartment() == 999)
-					chiefControllers = chiefControllers + "<option value = \"" + String.valueOf(String.valueOf(can.getId()).hashCode()) + "\">" + can.getLastName() + "</option>";
-			} catch (NoSuchElementException nsee){
-				// nothing
-			}
+			chiefControllers = chiefControllers + "<option value = \"" + String.valueOf(String.valueOf(can.getId() + salt).hashCode()) + "\">" + can.getLastName() + "</option>";
 		}
 		adderCardsString = adderCardsString.replace("$chiefControllers", chiefControllers);
+		
+		// forming primary executors list (heads of departments)
+		String primaryExecutors = "";
+		for (Soldier sol : db.getSoldiers()){
+			primaryExecutors = primaryExecutors + "<option value = \"" + String.valueOf(String.valueOf(sol.getId() + salt).hashCode()) + "\">" + sol.getLastName() + "</option>";
+		}
+		adderCardsString = adderCardsString.replace("$primaryExecutors", primaryExecutors);
 		out.println(adderCardsString);
 	}
 
+	// generating codes for card using 36 position numeration system
 	private String generateCode(Commander commander){
 		//generating string:
 		String code = commander.getLastName() + String.valueOf(new Date().getTime()); 
