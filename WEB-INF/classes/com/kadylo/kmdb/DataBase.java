@@ -63,17 +63,25 @@ public class DataBase{
 		// we have to use this form instead of try-with-resourses in order to allow rollback
 		Connection connection = Pool.getConnection();
 		try{
-			connection.setAutoCommit(false);			
+			//connection.setAutoCommit(false);			
 			PreparedStatement statement = connection.prepareStatement(sentense);
+			System.out.println("h1 " + document.getNumber());
 			statement.setInt(1, document.getNumber());
+			System.out.println("h2 " + document.getDepartment());
 			statement.setInt(2, document.getDepartment());
+			System.out.println("h3 " + document.getDate().getTime());
 			statement.setDate(3, new java.sql.Date(document.getDate().getTime()));
+			System.out.println("h4 " + document.getTitle());
 			statement.setString(4, document.getTitle());
+			System.out.println("h5 " + document.getProducer().getId());
 			statement.setInt(5, document.getProducer().getId());
+			System.out.println("h6 " + document.getStar().getId());
 			statement.setInt(6, document.getStar().getId());
+			System.out.println("h7");
 			statement.executeUpdate();
+			System.out.println("h8");
 		
-			connection.commit();
+			//connection.commit();
 		} catch (SQLException e){
 			connection.rollback();
 			e.printStackTrace();
@@ -83,12 +91,6 @@ public class DataBase{
 			connection.close();
 		}
 	}
-	
-	
-	
-	
-	
-	
 		
 	// this method adds specified card and overrides it if needed
 	public void addCard(Card card) throws SQLException{

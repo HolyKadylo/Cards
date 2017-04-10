@@ -24,6 +24,7 @@ public class Document extends MasterDocument{
 	}
 	
 	//without scanned file
+	//(sol.getDepartment(), docNum, new Date(), comm, sol, docName);
 	Document (int dep, int num, Date date, Commander comm, Soldier sol, String title){
 		super(dep,num,date,comm,sol,title);
 		if (dep == 0 

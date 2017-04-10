@@ -97,12 +97,18 @@ public class AdderCards extends HttpServlet{
 			}
 		}
 		
+		if (sol == null)
+			throw new ServletException("null sol");
+		if (comm == null)
+			throw new ServletException ("null comm");
+		
+		// date is wrong TODO
 		Document doc = new Document (sol.getDepartment(), docNum, new Date(), comm, sol, docName);
 		Card card = new Card(cardTag, db.getCommander(chiefTag), new Date(), dir, new Date(0), request.getParameter("wtc"), db.getSoldier(solTag), doc);
 
-		try{
-			ArrayList<Document> docum = db.getDocument(docNum);
-		} catch (NoSuchElementException nsee){
+		//try{
+			//ArrayList<Document> docum = db.getDocument(docNum);
+		//} catch (NoSuchElementException nsee){
 			
 			//means that there is no such document
 			try{
@@ -114,7 +120,7 @@ public class AdderCards extends HttpServlet{
 				response.sendRedirect("/cards/dashboard?msg=ntwerttn");
 				return;
 			}
-		}
+		//}
 		
 		try{
 			db.addCard(card);
