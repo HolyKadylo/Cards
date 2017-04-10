@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Мои карты
+	</title>
+</head>
+<body>
+	<!--ТУДУ мейк іт скріпт window.location.href = "/cards/login.html"-->
+<script>
+		var url = window.location.href
+
+		var cardAdded= "&msg=crdadd"
+		var wrongSoldier= "msg=wrnsol"
+		if (url.includes(cardAdded)){
+			alert("Карта успешно добавлена")
+		}	
+		if (url.includes(wrongSoldier)){
+			alert("Неверно указан исполнитель документа")
+		}	
+	</script>
+	<span id="allcards" style="float:left;width:30%;height:100%;">
+		<h2>Всего карт к исполнению: $numCardsToExecute</h2><br>
+		<list>
+			$listOfCardsToExecute
+		</list>
+		<a href="/cards/addcard">[Добавить карту]</a>
+	</span>
+
+	<span id="head">Здравствуйте, <b>$username</b>
+		<a href="/cards/logout">[Выйти]</a><br><br>
+	</span><br>
+
+	$content
+
+</body>
+</html>

@@ -58,7 +58,7 @@ public class DataBase{
 	public void addDocument(Document document) throws SQLException{
 		
 		//(id, chiefController, created, directive, closed, task, primaryExecutor, document, secondaryControlers, secondaryExecutors, archived, isPushedToChief)
-		String sentense = "INSERT INTO Documents (number, department, created, title, producer, star) VALUES (?, ?, ?, ?, ?, ?)";
+		String sentense = "INSERT INTO Documents (code, number, department, created, title, producer, star) VALUES ((SELECT MAX(code) FROM Documents) + 1, ?, ?, ?, ?, ?, ?)";
 		
 		// we have to use this form instead of try-with-resourses in order to allow rollback
 		Connection connection = Pool.getConnection();

@@ -248,67 +248,134 @@ public class CommanderManager extends HttpServlet{
 				content = content.replace("$cardTask", card.getTask());
 
 				// forming $listOfSecondaryExecutors
-				String listOfSecondaryExecutors = "";
+				// if he is primary executor!
+				if (card.isPrimaryExecutor(soldier)){
+					String listOfSecondaryExecutors = "";
 
-				// this executor will be modified;
-				String changeEx;
-				Soldier soldierToModify = null;
-				{
-					changeEx = request.getParameter("changeEx");
-				}
-				try{
-					if (changeEx != null){
-						soldierToModify = db.getSoldier(Integer.parseInt(changeEx));
+					// this executor will be modified;
+					String changeEx;
+					Soldier soldierToModify = null;
+					{
+						changeEx = request.getParameter("changeEx");
 					}
-				} catch (NoSuchElementException nsee) {
-
-					//nothing 
-				}
-
-				boolean wasModified = false;
-				try{
-					wasModified = request.getAttribute("modified").equals("ok");
-				}catch (NullPointerException npe){
-					wasModified = false;
-					request.setAttribute("modified", "notok");
-				}
-				
-				for(Soldier secondExecutor : card.getSecondaryExecutors().keySet()){
-					if (!secondExecutor.equals(soldierToModify) || wasModified ){
-						listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": " + card.getSecondaryExecutors().get(secondExecutor) + "<br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><a href=\"?executionFocus=" + card.getId() + "&changeEx=" + String.valueOf(secondExecutor.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
-						request.setAttribute("modified", "notok");
-					} else {
-						listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newTask\" placeholder=\"" + card.getSecondaryExecutors().get(secondExecutor) + "\"><br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
-					}
-				}
-				// content = content.replace("$thisCard", card.getId());
-				content = content.replace("$listOfSecondaryExecutors", listOfSecondaryExecutors);
-				commanderString = commanderString.replace("$content", content);
-				commanderString = commanderString.replace("$cardFocus", card.getId());	
-				// commanderString = commanderString.replace("$isDisabledPushChief", String.valueOf(!card.getPushed(card.getChiefController())));
-				
-				//now making secondary controllers
-				// in order to not providing in HTML response commander's tabel number,
-				// we are going to replace them with salted hash
-				File saltFile = new File(PATH_TO_SALT);
-				String salt = FileUtils.readFileToString(saltFile, "windows-1251");
-
-				String secondaryControllersString = " ";
-				//HashMap <Commander, HashMap<Signature, String>> getSecondaryControllers(){
-				for (Commander comd : card.getSecondaryControllers().keySet()){
-					for (Signature signature : card.getSecondaryControllers().get(comd).keySet()){
-							
-						// means was signed
-						if (signature.doesExist()){
-							secondaryControllersString = secondaryControllersString + comd.getLastName() + ": <strike>" + card.getSecondaryControllers().get(comd).get(signature) + "</strike> Подписано " + dateFormat.format(signature.getApplied()) + "<br>Комментарий: " + signature.getComment() + "<br><br>";
-							continue;
+					try{
+						if (changeEx != null){
+							soldierToModify = db.getSoldier(Integer.parseInt(changeEx));
 						}
-						String encodedCommanderTag = String.valueOf(comd.getId()) + salt;
-						secondaryControllersString = secondaryControllersString + comd.getLastName() + ": " + card.getSecondaryControllers().get(comd).get(signature) + "<br><br>";
+					} catch (NoSuchElementException nsee) {
+
+						//nothing 
 					}
+
+					boolean wasModified = false;
+					try{
+						wasModified = request.getAttribute("modified").equals("ok");
+					}catch (NullPointerException npe){
+						wasModified = false;
+						request.setAttribute("modified", "notok");
+					}
+				
+					for(Soldier secondExecutor : card.getSecondaryExecutors().keySet()){
+						if (!secondExecutor.equals(soldierToModify) || wasModified ){
+							listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": " + card.getSecondaryExecutors().get(secondExecutor) + "<br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><a href=\"?executionFocus=" + card.getId() + "&changeEx=" + String.valueOf(secondExecutor.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
+							request.setAttribute("modified", "notok");
+						} else {
+							listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newTask\" placeholder=\"" + card.getSecondaryExecutors().get(secondExecutor) + "\"><br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
+						}
+					}
+					// content = content.replace("$thisCard", card.getId());
+					content = content.replace("$listOfSecondaryExecutors", listOfSecondaryExecutors);
+					commanderString = commanderString.replace("$content", content);
+					commanderString = commanderString.replace("$cardFocus", card.getId());	
+					// commanderString = commanderString.replace("$isDisabledPushChief", String.valueOf(!card.getPushed(card.getChiefController())));
+				
+					//now making secondary controllers
+					// in order to not providing in HTML response commander's tabel number,
+					// we are going to replace them with salted hash
+					File saltFile = new File(PATH_TO_SALT);
+					String salt = FileUtils.readFileToString(saltFile, "windows-1251");
+
+					String secondaryControllersString = " ";
+					//HashMap <Commander, HashMap<Signature, String>> getSecondaryControllers(){
+					for (Commander comd : card.getSecondaryControllers().keySet()){
+						for (Signature signature : card.getSecondaryControllers().get(comd).keySet()){
+							
+							// means was signed
+							if (signature.doesExist()){
+								secondaryControllersString = secondaryControllersString + comd.getLastName() + ": <strike>" + card.getSecondaryControllers().get(comd).get(signature) + "</strike> Подписано " + dateFormat.format(signature.getApplied()) + "<br>Комментарий: " + signature.getComment() + "<br><br>";
+								continue;
+							}
+							String encodedCommanderTag = String.valueOf(comd.getId()) + salt;
+							secondaryControllersString = secondaryControllersString + comd.getLastName() + ": " + card.getSecondaryControllers().get(comd).get(signature) + "<br><br>";
+						}
+					}
+					commanderString = commanderString.replace("$secondaryControllers", secondaryControllersString);
+
+				// means that it is not primary executor
+				// very bad but I'm tired
+				} else {
+					String listOfSecondaryExecutors = "";
+
+					// this executor will be modified;
+					String changeEx;
+					Soldier soldierToModify = null;
+					{
+						changeEx = request.getParameter("changeEx");
+					}
+					try{
+						if (changeEx != null){
+							soldierToModify = db.getSoldier(Integer.parseInt(changeEx));
+						}
+					} catch (NoSuchElementException nsee) {
+
+						//nothing 
+					}
+
+					boolean wasModified = false;
+					try{
+						wasModified = request.getAttribute("modified").equals("ok");
+					}catch (NullPointerException npe){
+						wasModified = false;
+						request.setAttribute("modified", "notok");
+					}
+				
+					for(Soldier secondExecutor : card.getSecondaryExecutors().keySet()){
+						//if (!secondExecutor.equals(soldierToModify) || wasModified ){
+							listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": " + card.getSecondaryExecutors().get(secondExecutor) + "<br></li>";
+						//	request.setAttribute("modified", "notok");
+						//} else {
+						//	listOfSecondaryExecutors = listOfSecondaryExecutors + "<li>" + secondExecutor.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newTask\" placeholder=\"" + card.getSecondaryExecutors().get(secondExecutor) + "\"><br><a href=\"?executionFocus=" + card.getId() + "&deleteEx=" + String.valueOf(secondExecutor.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
+						//}
+					}
+					// content = content.replace("$thisCard", card.getId());
+					content = content.replace("$listOfSecondaryExecutors", listOfSecondaryExecutors);
+					commanderString = commanderString.replace("$content", content);
+					commanderString = commanderString.replace("$cardFocus", card.getId());	
+					// commanderString = commanderString.replace("$isDisabledPushChief", String.valueOf(!card.getPushed(card.getChiefController())));
+				
+					//now making secondary controllers
+					// in order to not providing in HTML response commander's tabel number,
+					// we are going to replace them with salted hash
+					File saltFile = new File(PATH_TO_SALT);
+					String salt = FileUtils.readFileToString(saltFile, "windows-1251");
+
+					String secondaryControllersString = " ";
+					//HashMap <Commander, HashMap<Signature, String>> getSecondaryControllers(){
+					for (Commander comd : card.getSecondaryControllers().keySet()){
+						for (Signature signature : card.getSecondaryControllers().get(comd).keySet()){
+							
+							// means was signed
+							if (signature.doesExist()){
+								secondaryControllersString = secondaryControllersString + comd.getLastName() + ": <strike>" + card.getSecondaryControllers().get(comd).get(signature) + "</strike> Подписано " + dateFormat.format(signature.getApplied()) + "<br>Комментарий: " + signature.getComment() + "<br><br>";
+								continue;
+							}
+							String encodedCommanderTag = String.valueOf(comd.getId()) + salt;
+							secondaryControllersString = secondaryControllersString + comd.getLastName() + ": " + card.getSecondaryControllers().get(comd).get(signature) + "<br><br>";
+						}
+					}
+					commanderString = commanderString.replace("$secondaryControllers", secondaryControllersString);
+
 				}
-				commanderString = commanderString.replace("$secondaryControllers", secondaryControllersString);
-	
 			// means that it wasn't selected
 			} else {
 				try{
@@ -420,15 +487,31 @@ public class CommanderManager extends HttpServlet{
 				}
 				
 				for(Commander secondController : card.getSecondaryControllers().keySet()){
-					if (!secondController.equals(commanderToModify) || wasModified ){
-						for(Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
-							listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": " + card.getSecondaryControllers().get(secondController).get(sign) + "<br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><a href=\"?controllFocus=" + card.getId() + "&changeCo=" + String.valueOf(secondController.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
-							break;
+					boolean wasVised = false;
+					try {
+						wasVised = card.getVised(secondController);
+					} catch (IllegalArgumentException iae){
+						wasVised = false;
+					}
+					if (wasVised){
+						//***********
+						for (Signature si : card.getSecondaryControllers().get(secondController).keySet()){
+							if (si.doesExist()){
+								listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": <strike>" + card.getSecondaryControllers().get(secondController).get(si) + "</strike> Подписано " + dateFormat.format(si.getApplied()) + " Комментарий: " + si.getComment() + "</li>";
+								continue;
+							}
 						}
-						request.setAttribute("modified", "notok");
-					} else {
-						for (Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
-							listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newCoTask\" placeholder=\"" + card.getSecondaryControllers().get(secondController).get(sign) + "\"><br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
+					} else{
+						if (!secondController.equals(commanderToModify) || wasModified ){
+							for(Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
+								listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": " + card.getSecondaryControllers().get(secondController).get(sign) + "<br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><a href=\"?controllFocus=" + card.getId() + "&changeCo=" + String.valueOf(secondController.getId()) + "\">[Изменить формулировку]</a><br>." + "</li>";
+								break;
+							}
+							request.setAttribute("modified", "notok");
+						} else {
+							for (Signature sign : card.getSecondaryControllers().get(secondController).keySet()){
+								listOfSecondaryControllers = listOfSecondaryControllers + "<li>" + secondController.getLastName() + ": <form method=\"POST\"><input type=\"text\" size=\"25\" name=\"newCoTask\" placeholder=\"" + card.getSecondaryControllers().get(secondController).get(sign) + "\"><br><a href=\"?controllFocus=" + card.getId() + "&deleteCo=" + String.valueOf(secondController.getId()) + "\">[Убрать]</a><input type=\"submit\" value=\"[OK]\"><br>." + "</form></li>";
+							}
 						}
 					}
 				}
