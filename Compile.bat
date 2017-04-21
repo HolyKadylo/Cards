@@ -30,4 +30,5 @@ javac -Xlint:all -cp .;"%CD%"/WEB-INF/lib;"%CD%"/WEB-INF/classes/ "%CD%"/WEB-INF
 ECHO 
 pause
 echo on
+
 cls
